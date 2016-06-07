@@ -31,5 +31,88 @@ namespace Froq\Pager;
  */
 final class Pager
 {
-    //
+    private $start = 0;
+    private $stop = 10;
+    private $stopMax = 1000;
+    private $stopDefault = 10;
+    private $startKey = 's';
+    private $stopKey = 'ss';
+    private $totalPages;
+    private $totalRecords;
+
+    final public function __construct()
+    {}
+
+    final public function setStart(int $start)
+    {
+        $this->start = abs($start);
+    }
+    final public function getStart(): int
+    {
+        return $this->start;
+    }
+
+    final public function setStop(int $stop)
+    {
+        $this->stop = abs($stop);
+        if ($this->stop > $this->stopMax) {
+            $this->stop = $this->stopMax;
+        }
+    }
+    final public function getStop(): int
+    {
+        return $this->stop;
+    }
+
+    final public function setStopMax(int $stopMax)
+    {
+        $this->stopMax = abs($stopMax);
+    }
+
+    final public function setStartKey(string $startKey)
+    {
+        $this->startKey = $startKey;
+    }
+    final public function getStartKey(): string
+    {
+        return $this->startKey;
+    }
+
+    final public function setStopKey(string $stopKey)
+    {
+        $this->stopKey = $stopKey;
+    }
+    final public function getStopKey(): string
+    {
+        return $this->stopKey;
+    }
+
+    final public function setTotalPages(int $totalPages)
+    {
+        $this->totalPages = abs($totalPages);
+    }
+
+    final public function setTotalRecords(int $totalRecords)
+    {
+        $this->totalRecords = abs($totalRecords);
+    }
+
+    final public function run()
+    {
+        $app = app();
+
+        $this->setStart((int) $app->request->params->get($this->startKey));
+        $this->setStop((int) $app->request->params->get($this->stopKey));
+
+        $stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
+        $start = ($this->start > 1) ? $this->start * $stop - $stop : 0;
+
+        $this->stop = $stop;
+        $this->start = $start;
+        if ($this->totalRecords) {
+            $this->totalPages = (int) ceil($this->totalRecords / $this->stop);
+        }
+
+        pre($this);
+    }
 }
