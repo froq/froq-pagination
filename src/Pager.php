@@ -31,27 +31,84 @@ namespace Froq\Pager;
  */
 final class Pager
 {
+    /**
+     * Start.
+     * @var int
+     */
     private $start = 0;
+
+    /**
+     * Stop.
+     * @var int
+     */
     private $stop = 10;
+
+    /**
+     * Stop max.
+     * @var int
+     */
     private $stopMax = 1000;
+
+    /**
+     * Stop default.
+     * @var int
+     */
     private $stopDefault = 10;
+
+    /**
+     * Start key.
+     * @var string
+     */
     private $startKey = 's';
+
+    /**
+     * Stop key.
+     * @var string
+     */
     private $stopKey = 'ss';
+
+    /**
+     * Total pages.
+     * @var int|null
+     */
     private $totalPages;
+
+    /**
+     * Total records.
+     * @var int|null
+     */
     private $totalRecords;
 
+    /**
+     * Constructor.
+     */
     final public function __construct()
     {}
 
+    /**
+     * Set start.
+     * @param  int $start
+     * @return void
+     */
     final public function setStart(int $start)
     {
         $this->start = abs($start);
     }
+
+    /**
+     * Get start.
+     * @return int
+     */
     final public function getStart(): int
     {
         return $this->start;
     }
 
+    /**
+     * Set stop.
+     * @param  int $stop
+     * @return void
+     */
     final public function setStop(int $stop)
     {
         $this->stop = abs($stop);
@@ -59,44 +116,115 @@ final class Pager
             $this->stop = $this->stopMax;
         }
     }
+
+    /**
+     * Get stop.
+     * @return int
+     */
     final public function getStop(): int
     {
         return $this->stop;
     }
 
+    /**
+     * Set stop max.
+     * @param  int $stopMax
+     * @return void
+     */
     final public function setStopMax(int $stopMax)
     {
-        $this->stopMax = abs($stopMax);
+        $this->stopMax = $stopMax;
     }
 
+    /**
+     * Get stop max.
+     * @return int
+     */
+    final public function getStopMax(): int
+    {
+        return $this->stopMax;
+    }
+
+    /**
+     * Set start key.
+     * @param  string $startKey
+     * @return void
+     */
     final public function setStartKey(string $startKey)
     {
         $this->startKey = $startKey;
     }
+
+    /**
+     * Get start key.
+     * @return string
+     */
     final public function getStartKey(): string
     {
         return $this->startKey;
     }
 
+    /**
+     * Set stop key.
+     * @param  string $stopKey
+     * @return void
+     */
     final public function setStopKey(string $stopKey)
     {
         $this->stopKey = $stopKey;
     }
+
+    /**
+     * Get stop key.
+     * @return string
+     */
     final public function getStopKey(): string
     {
         return $this->stopKey;
     }
 
+    /**
+     * Set total pages.
+     * @param  int $totalPages
+     * @return void
+     */
     final public function setTotalPages(int $totalPages)
     {
         $this->totalPages = abs($totalPages);
     }
 
+    /**
+     * Get total pages.
+     * @return int|null
+     */
+    final public function getTotalPages()
+    {
+        return $this->totalPages;
+    }
+
+    /**
+     * Set total records.
+     * @param  int $totalRecords
+     * @return void
+     */
     final public function setTotalRecords(int $totalRecords)
     {
         $this->totalRecords = abs($totalRecords);
     }
 
+    /**
+     * Get total records.
+     * @return int|null
+     */
+    final public function getTotalRecords()
+    {
+        return $this->totalRecords;
+    }
+
+    /**
+     * Run.
+     * @return void
+     */
     final public function run()
     {
         $app = app();
