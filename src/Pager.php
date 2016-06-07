@@ -80,6 +80,12 @@ final class Pager
     private $totalRecords;
 
     /**
+     * Class name.
+     * @var string
+     */
+    private $className = 'pager';
+
+    /**
      * Constructor.
      */
     final public function __construct()
@@ -240,7 +246,52 @@ final class Pager
         if ($this->totalRecords) {
             $this->totalPages = (int) ceil($this->totalRecords / $this->stop);
         }
+    }
 
-        pre($this);
+    /**
+     * Template.
+     * @param  array       $links
+     * @param  string|null $className
+     * @return string
+     */
+    final public function template(array $links, string $className = null): string
+    {
+        $className = $className ?? $this->className;
+
+        $tpl  = "<ul class=\"{$className}\">";
+        foreach ($links as $link) {
+            $tpl .= "<li>{$link}</li>";
+        }
+        $tpl .= "</ul>";
+
+        return $tpl;
+    }
+
+    /**
+     * Get URL.
+     * @param  string|null $keyIgnored
+     * @return string
+     */
+    final public function getUrl(string $keyIgnored = null): string
+    {
+        $app = app();
+
+        $url = sprintf('%s://%s%s',
+            $app->request->uri->getScheme(),
+            $app->request->uri->getHost(),
+            $app->request->uri->getPath()
+        );
+
+        $query = $app->request->uri->getQuery();
+        if ($query) {
+            parse_str($query, $query);
+            $query = to_query_String($query, "{$this->startKey},{$keyIgnored}");
+            if ($query) {
+                $query .= '&';
+            }
+            $url .= '?'. $query;
+        }
+
+        return $url;
     }
 }
