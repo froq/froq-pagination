@@ -254,7 +254,7 @@ final class Pager
      * @param  string|null $className
      * @return string
      */
-    final public function template(array $links, string $className = null): string
+    final private function template(array $links, string $className = null): string
     {
         $className = $className ?? $this->className;
 
@@ -272,7 +272,7 @@ final class Pager
      * @param  string|null $keyIgnored
      * @return string
      */
-    final public function getUrl(string $keyIgnored = null): string
+    final private function getUrl(string $keyIgnored = null): string
     {
         $app = app();
 
@@ -285,7 +285,7 @@ final class Pager
         $query = $app->request->uri->getQuery();
         if ($query) {
             parse_str($query, $query);
-            $query = to_query_String($query, "{$this->startKey},{$keyIgnored}");
+            $query = to_query_string($query, "{$this->startKey},{$keyIgnored}");
             if ($query) {
                 $query .= '&';
             }
