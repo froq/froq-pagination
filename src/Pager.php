@@ -223,6 +223,18 @@ final class Pager
     }
 
     /**
+     * Set links limit.
+     * @param  int $linksLimit
+     * @return self
+     */
+    final public function setLinksLimit(int $linksLimit): self
+    {
+        $this->linksLimit = $linksLimit;
+
+        return $this;
+    }
+
+    /**
      * Set links template.
      * @param  array $linksTemplate
      * @return self
