@@ -333,10 +333,8 @@ final class Pager
      */
     final public function generateLinksCenter(string $keyIgnored = null, $linksClassName = null): string
     {
-        $app = app();
-
         $url = $this->getUrl($keyIgnored);
-        $start = (($start = (int) $app->request->params->get($this->startKey)) > 1) ? $start : 1;
+        $start = (($start = (int) app()->request->params->get($this->startKey)) > 1) ? $start : 1;
 
         // add first & prev links
         $prev = $start - 1;
