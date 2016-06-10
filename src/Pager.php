@@ -309,11 +309,11 @@ final class Pager
     }
 
     /**
-     * Get URL.
+     * Prepare current URL.
      * @param  string|null $keyIgnored
      * @return string
      */
-    final public function getUrl(string $keyIgnored = null): string
+    final public function prepareCurrentUrl(string $keyIgnored = null): string
     {
         $app = app();
 
@@ -362,7 +362,7 @@ final class Pager
             return $this->template($this->links, $linksClassName);
         }
 
-        $url = $this->getUrl($keyIgnored);
+        $url = $this->prepareCurrentUrl($keyIgnored);
         $start = (($start = (int) app()->request->params->get($this->startKey)) > 1) ? $start : 1;
 
         // add first & prev links
