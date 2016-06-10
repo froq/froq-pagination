@@ -106,6 +106,12 @@ final class Pager
     private $linksClassName = 'pager';
 
     /**
+     * Aautorun.
+     * @var bool
+     */
+    private $autorun = true;
+
+    /**
      * Constructor.
      */
     final public function __construct()
@@ -258,15 +264,36 @@ final class Pager
     }
 
     /**
+     * Set autorun.
+     * @param  bool $autorun
+     * @return void
+     */
+    final public function setAutorun(bool $autorun)
+    {
+        $this->autorun = $autorun;
+    }
+
+    /**
+     * Get autorun.
+     * @return bool
+     */
+    final public function getAutorun(): bool
+    {
+        return $this->autorun;
+    }
+
+    /**
      * Run.
      * @return void
      */
     final public function run()
     {
-        $app = app();
-
-        // $this->setStart((int) $app->request->params->get($this->startKey));
-        // $this->setStop((int) $app->request->params->get($this->stopKey));
+        // get params manipulated by developer?
+        if ($this->autorun) {
+            $app = app();
+            $this->setStart((int) $app->request->params->get($this->startKey));
+            $this->setStop((int) $app->request->params->get($this->stopKey));
+        }
 
         $stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
         $start = ($this->start > 1) ? $this->start * $stop - $stop : 0;
