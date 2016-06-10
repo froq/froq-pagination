@@ -332,10 +332,15 @@ final class Pager
 
     /**
      * Run.
+     * @param  int|null $totalRecords
      * @return array
      */
-    final public function run(): array
+    final public function run(int $totalRecords = null): array
     {
+        if ($totalRecords !== null) {
+            $this->setTotalRecords($totalRecords);
+        }
+
         // get params manipulated by developer?
         if ($this->autorun) {
             $app = app();
