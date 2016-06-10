@@ -120,11 +120,13 @@ final class Pager
     /**
      * Set start.
      * @param  int $start
-     * @return void
+     * @return self
      */
-    final public function setStart(int $start)
+    final public function setStart(int $start): self
     {
         $this->start = abs($start);
+
+        return $this;
     }
 
     /**
@@ -139,14 +141,16 @@ final class Pager
     /**
      * Set stop.
      * @param  int $stop
-     * @return void
+     * @return self
      */
-    final public function setStop(int $stop)
+    final public function setStop(int $stop): self
     {
         $this->stop = abs($stop);
         if ($this->stop > $this->stopMax) {
             $this->stop = $this->stopMax;
         }
+
+        return $this;
     }
 
     /**
@@ -161,11 +165,13 @@ final class Pager
     /**
      * Set stop max.
      * @param  int $stopMax
-     * @return void
+     * @return self
      */
-    final public function setStopMax(int $stopMax)
+    final public function setStopMax(int $stopMax): self
     {
         $this->stopMax = $stopMax;
+
+        return $this;
     }
 
     /**
@@ -180,11 +186,13 @@ final class Pager
     /**
      * Set start key.
      * @param  string $startKey
-     * @return void
+     * @return self
      */
-    final public function setStartKey(string $startKey)
+    final public function setStartKey(string $startKey): self
     {
         $this->startKey = $startKey;
+
+        return $this;
     }
 
     /**
@@ -199,11 +207,13 @@ final class Pager
     /**
      * Set stop key.
      * @param  string $stopKey
-     * @return void
+     * @return self
      */
-    final public function setStopKey(string $stopKey)
+    final public function setStopKey(string $stopKey): self
     {
         $this->stopKey = $stopKey;
+
+        return $this;
     }
 
     /**
@@ -218,11 +228,13 @@ final class Pager
     /**
      * Set total pages.
      * @param  int $totalPages
-     * @return void
+     * @return self
      */
-    final public function setTotalPages(int $totalPages)
+    final public function setTotalPages(int $totalPages): self
     {
         $this->totalPages = abs($totalPages);
+
+        return $this;
     }
 
     /**
@@ -237,11 +249,13 @@ final class Pager
     /**
      * Set total records.
      * @param  int $totalRecords
-     * @return void
+     * @return self
      */
-    final public function setTotalRecords(int $totalRecords)
+    final public function setTotalRecords(int $totalRecords): self
     {
         $this->totalRecords = abs($totalRecords);
+
+        return $this;
     }
 
     /**
@@ -256,21 +270,25 @@ final class Pager
     /**
      * Set links template.
      * @param  array $linksTemplate
-     * @return void
+     * @return self
      */
-    final public function setLinksTemplate(array $linksTemplate)
+    final public function setLinksTemplate(array $linksTemplate): self
     {
         $this->linksTemplate = array_merge($this->linksTemplate, $linksTemplate);
+
+        return $this;
     }
 
     /**
      * Set autorun.
      * @param  bool $autorun
-     * @return void
+     * @return self
      */
-    final public function setAutorun(bool $autorun)
+    final public function setAutorun(bool $autorun): self
     {
         $this->autorun = $autorun;
+
+        return $this;
     }
 
     /**
@@ -284,9 +302,9 @@ final class Pager
 
     /**
      * Run.
-     * @return void
+     * @return array
      */
-    final public function run()
+    final public function run(): array
     {
         // get params manipulated by developer?
         if ($this->autorun) {
@@ -303,6 +321,8 @@ final class Pager
         if ($this->totalRecords) {
             $this->setTotalPages((int) ceil($this->totalRecords / $this->stop));
         }
+
+        return [$this->start, $this->stop];
     }
 
     /**
