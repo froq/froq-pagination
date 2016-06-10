@@ -324,4 +324,42 @@ final class Pager
 
         return html_encode($url);
     }
+
+    /**
+     * Generate links center.
+     * @param  string|null $keyIgnored
+     * @param  string      $linksClassName
+     * @return string
+     */
+    final public function generateLinksCenter(string $keyIgnored = null, $linksClassName = null): string
+    {
+        $app = app();
+
+        $url = $this->getUrl($keyIgnored);
+        $start = (($start = (int) $app->request->params->get($this->startKey)) > 1) ? $start : 1;
+
+        // add first & prev links
+        $prev = $start - 1;
+        if ($prev >= 1) {
+            $this->links[] = sprintf('<a class="first" rel="first" href="%s%s=1">%s</a>',
+                $url, $this->startKey, $this->linksTemplate['first']);
+            $this->links[] = sprintf('<a class="prev" rel="prev" href="%s%s=%s">%s</a>',
+                $url, $this->startKey, $prev, $this->linksTemplate['prev']);
+        }
+
+        $this->links[] = sprintf('<a class="current" rel="current" href="#">%s %s</a>',
+            $this->linksTemplate['page'], $start);
+
+        // add next & last link
+        $next = $start + 1;
+        if ($start < $this->totalPages) {
+            $this->links[] = sprintf('<a class="next" rel="next" href="%s%s=%s">%s</a>',
+                $url, $this->startKey, $next, $this->linksTemplate['next']);
+            $this->links[] = sprintf('<a class="last" rel="last" href="%s%s=%s">%s</a>',
+                $url, $this->startKey, $this->totalPages, $this->linksTemplate['last']);
+        }
+
+        // return template
+        return $this->template($this->links, $linksClassName);
+    }
 }
