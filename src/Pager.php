@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace Froq\Pager;
 
+use Froq\Util\Traits\GetterTrait;
+
 /**
  * @package    Froq
  * @subpackage Froq\Pager
@@ -31,6 +33,12 @@ namespace Froq\Pager;
  */
 final class Pager
 {
+    /**
+     * Getter.
+     * @object Froq\Util\Traits\GetterTrait
+     */
+    use GetterTrait;
+
     /**
      * Start.
      * @var int
@@ -79,11 +87,23 @@ final class Pager
      */
     private $totalRecords;
 
+    private $links = [];
+    private $linksLimit = 5;
+    private $linksLimitMax = 9;
+
+    private $linksTemplate = [
+        'page'  => 'Page',
+        'first' => '&laquo;',
+        'prev'  => '&lsaquo;',
+        'next'  => '&rsaquo;',
+        'last'  => '&raquo;'
+    ];
+
     /**
-     * Class name.
+     * Links class name.
      * @var string
      */
-    private $className = 'pager';
+    private $linksClassName = 'pager';
 
     /**
      * Constructor.
@@ -228,6 +248,16 @@ final class Pager
     }
 
     /**
+     * Set links template.
+     * @param  array $linksTemplate
+     * @return void
+     */
+    final public function setLinksTemplate(array $linksTemplate)
+    {
+        $this->linksTemplate = array_merge($this->linksTemplate, $linksTemplate);
+    }
+
+    /**
      * Run.
      * @return void
      */
@@ -235,8 +265,8 @@ final class Pager
     {
         $app = app();
 
-        $this->setStart((int) $app->request->params->get($this->startKey));
-        $this->setStop((int) $app->request->params->get($this->stopKey));
+        // $this->setStart((int) $app->request->params->get($this->startKey));
+        // $this->setStop((int) $app->request->params->get($this->stopKey));
 
         $stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
         $start = ($this->start > 1) ? $this->start * $stop - $stop : 0;
@@ -251,14 +281,14 @@ final class Pager
     /**
      * Template.
      * @param  array       $links
-     * @param  string|null $className
+     * @param  string|null $linksClassName
      * @return string
      */
-    final private function template(array $links, string $className = null): string
+    final public function template(array $links, string $linksClassName = null): string
     {
-        $className = $className ?? $this->className;
+        $linksClassName = $linksClassName ?? $this->linksClassName;
 
-        $tpl  = "<ul class=\"{$className}\">";
+        $tpl  = "<ul class=\"{$linksClassName}\">";
         foreach ($links as $link) {
             $tpl .= "<li>{$link}</li>";
         }
@@ -272,7 +302,7 @@ final class Pager
      * @param  string|null $keyIgnored
      * @return string
      */
-    final private function getUrl(string $keyIgnored = null): string
+    final public function getUrl(string $keyIgnored = null): string
     {
         $app = app();
 
@@ -292,6 +322,6 @@ final class Pager
             $url .= '?'. $query;
         }
 
-        return $url;
+        return html_encode($url);
     }
 }
