@@ -114,7 +114,7 @@ final class Pager
         'first' => '&laquo;',
         'prev'  => '&lsaquo;',
         'next'  => '&rsaquo;',
-        'last'  => '&raquo;'
+        'last'  => '&raquo;',
     ];
 
     /**
@@ -278,7 +278,6 @@ final class Pager
 
         $stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
         $start = ($this->start > 1) ? $this->start * $stop - $stop : 0;
-        pre($start);
 
         $this->stop = $stop;
         $this->start = $start;
@@ -363,7 +362,7 @@ final class Pager
         }
 
         $url = $this->prepareCurrentUrl($keyIgnored);
-        $start = (($start = (int) app()->request->params->get($this->startKey)) > 1) ? $start : 1;
+        $start = max(1, $this->start / $this->stop + 1);
 
         // add first & prev links
         $prev = $start - 1;
