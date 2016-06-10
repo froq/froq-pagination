@@ -403,12 +403,24 @@ final class Pager
     }
 
     /**
+     * Generate links.
+     * @param  int|null    $linksLimit
+     * @param  string|null $keyIgnored
+     * @param  string|null $linksClassName
+     * @return string
+     */
+    final public function generateLinks(int $linksLimit = null, string $keyIgnored = null,
+        string $linksClassName = null): string
+    {}
+
+    /**
      * Generate links center.
      * @param  string|null $keyIgnored
      * @param  string      $linksClassName
      * @return string
      */
-    final public function generateLinksCenter(string $keyIgnored = null, $linksClassName = null): string
+    final public function generateLinksCenter(string $keyIgnored = null,
+        $linksClassName = null): string
     {
         $url = $this->getUrl($keyIgnored);
         $start = (($start = (int) app()->request->params->get($this->startKey)) > 1) ? $start : 1;
