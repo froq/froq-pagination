@@ -148,15 +148,6 @@ final class Pager
     }
 
     /**
-     * Get start.
-     * @return int
-     */
-    final public function getStart(): int
-    {
-        return $this->start;
-    }
-
-    /**
      * Set stop.
      * @param  int $stop
      * @return self
@@ -172,15 +163,6 @@ final class Pager
     }
 
     /**
-     * Get stop.
-     * @return int
-     */
-    final public function getStop(): int
-    {
-        return $this->stop;
-    }
-
-    /**
      * Set stop max.
      * @param  int $stopMax
      * @return self
@@ -190,15 +172,6 @@ final class Pager
         $this->stopMax = $stopMax;
 
         return $this;
-    }
-
-    /**
-     * Get stop max.
-     * @return int
-     */
-    final public function getStopMax(): int
-    {
-        return $this->stopMax;
     }
 
     /**
@@ -214,15 +187,6 @@ final class Pager
     }
 
     /**
-     * Get start key.
-     * @return string
-     */
-    final public function getStartKey(): string
-    {
-        return $this->startKey;
-    }
-
-    /**
      * Set stop key.
      * @param  string $stopKey
      * @return self
@@ -232,15 +196,6 @@ final class Pager
         $this->stopKey = $stopKey;
 
         return $this;
-    }
-
-    /**
-     * Get stop key.
-     * @return string
-     */
-    final public function getStopKey(): string
-    {
-        return $this->stopKey;
     }
 
     /**
@@ -256,15 +211,6 @@ final class Pager
     }
 
     /**
-     * Get total pages.
-     * @return int|null
-     */
-    final public function getTotalPages()
-    {
-        return $this->totalPages;
-    }
-
-    /**
      * Set total records.
      * @param  int $totalRecords
      * @return self
@@ -274,15 +220,6 @@ final class Pager
         $this->totalRecords = abs($totalRecords);
 
         return $this;
-    }
-
-    /**
-     * Get total records.
-     * @return int|null
-     */
-    final public function getTotalRecords()
-    {
-        return $this->totalRecords;
     }
 
     /**
@@ -322,15 +259,6 @@ final class Pager
     }
 
     /**
-     * Get autorun.
-     * @return bool
-     */
-    final public function getAutorun(): bool
-    {
-        return $this->autorun;
-    }
-
-    /**
      * Run.
      * @param  int|null $totalRecords
      * @return array
@@ -350,6 +278,7 @@ final class Pager
 
         $stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
         $start = ($this->start > 1) ? $this->start * $stop - $stop : 0;
+        pre($start);
 
         $this->stop = $stop;
         $this->start = $start;
