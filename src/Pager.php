@@ -280,6 +280,18 @@ final class Pager
     }
 
     /**
+     * Set links class name.
+     * @param  string $linksClassName
+     * @return self
+     */
+    final public function setLinksClassName(string $linksClassName): self
+    {
+        $this->linksClassName = $linksClassName;
+
+        return $this;
+    }
+
+    /**
      * Set autorun.
      * @param  bool $autorun
      * @return self
