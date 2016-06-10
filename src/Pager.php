@@ -411,7 +411,9 @@ final class Pager
      */
     final public function generateLinks(int $linksLimit = null, string $keyIgnored = null,
         string $linksClassName = null): string
-    {}
+    {
+        // @todo
+    }
 
     /**
      * Generate links center.
