@@ -100,12 +100,6 @@ final class Pager
     private $linksLimit = 5;
 
     /**
-     * Links limit max.
-     * @var int
-     */
-    private $linksLimitMax = 9;
-
-    /**
      * Links template.
      * @var array
      */
@@ -363,7 +357,101 @@ final class Pager
     final public function generateLinks(int $linksLimit = null, string $keyIgnored = null,
         string $linksClassName = null): string
     {
-        // @todo
+        // only one page?
+        if ($this->totalPages == 1) {
+            return $this->template([
+                '<a class="current current-one" rel="current" href="#">1</a>'
+            ], $className);
+        }
+
+        if (!empty($this->links)) {
+            return $this->template($this->links, $className);
+        }
+
+        // numarate first and last links?
+        if (!$this->numerateFirstLast) {
+            $this->linksTemplate['first'] = 1;
+            $this->linksTemplate['last']  = $this->totalPages;
+        }
+
+        $linksLimit = $linksLimit ?? $this->linksLimit;
+        if ($linksLimit > $this->totalPages) {
+            $linksLimit = $this->totalPages;
+        }
+
+        $url = $this->prepareCurrentUrl($keyIgnored);
+        $start = max(1, $this->start / $this->stop + 1);
+        $stop = $start + $linksLimit;
+
+        // calculate loop
+        $sub = 1;
+        $middle = ceil($linksLimit / 2);
+        $middleSub = $middle - $sub;
+        if ($start >= $middle) {
+            $i = $start - $middleSub;
+            $loop = $stop - $middleSub;
+        } else {
+            $i = $sub;
+            $loop = $start == $middleSub ? $stop - $sub : $stop;
+            if ($loop >= $linksLimit) {
+                $diff = $loop - $linksLimit;
+                $loop = $loop - $diff + $sub;
+            }
+        }
+
+        // add first & prev links
+        $prev = $start - 1;
+        if ($prev >= 1) {
+            $this->links[] = sprintf('<a class="first" rel="first" href="%s%s=1">%s</a>',
+                $url, $this->startKey, $this->linksTemplate['first']);
+            $this->links[] = sprintf('<a class="prev" rel="prev" href="%s%s=%s">%s</a>',
+                $url, $this->startKey, $prev, $this->linksTemplate['prev']);
+        }
+
+        // add numbered links
+        for ($i; $i < $loop; $i++) {
+            if ($loop <= $this->totalPages) {
+                if ($i == $start) {
+                    $this->links[] = '<a class="current" rel="current" href="#">'. $i .'</a>';
+                } else {
+                    $relPrevNext = '';
+                    if ($i == $start - 1) {
+                        $relPrevNext = ' rel="prev"';
+                    } elseif ($i == $start + 1) {
+                        $relPrevNext = ' rel="next"';
+                    }
+                    $this->links[] = sprintf('<a%s href="%s%s=%s">%s</a>',
+                        $relPrevNext, $url, $this->startKey, $i, $i);
+                }
+            } else {
+                $j = $start;
+                $extra = $this->totalPages - $start;
+                if ($extra < $linksLimit) {
+                    $j = $j - (($linksLimit - 1) - $extra);
+                }
+
+                for ($j; $j <= $this->totalPages; $j++) {
+                    if ($j == $start) {
+                        $this->links[] = '<a class="current" rel="current" href="#">'. $i .'</a>';
+                    } else {
+                        $this->links[] = sprintf('<a rel="next" href="%s%s=%s">%s</a>',
+                            $url, $this->startKey, $j, $j);
+                    }
+                }
+                break;
+            }
+        }
+
+        // add next & last link
+        $next = $start + 1;
+        if ($start != $this->totalPages) {
+            $this->links[] = sprintf('<a class="next" rel="next" href="%s%s=%s">%s</a>',
+                $url, $this->startKey, $next, $this->linksTemplate['next']);
+            $this->links[] = sprintf('<a class="last" rel="last" href="%s%s=%s">%s</a>',
+                $url, $this->startKey, $this->totalPages, $this->linksTemplate['last']);
+        }
+
+        return $this->template($this->links, $linksClassName);
     }
 
     /**
