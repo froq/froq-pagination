@@ -121,7 +121,7 @@ final class Pager
      * Numarate first last.
      * @var bool
      */
-    private $numerateFirstLast = true;
+    private $numerateFirstLast = false;
 
     /**
      * Aautorun.
