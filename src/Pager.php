@@ -422,6 +422,10 @@ final class Pager
     final public function generateLinksCenter(string $keyIgnored = null,
         $linksClassName = null): string
     {
+        if (!empty($this->links)) {
+            return $this->template($this->links, $linksClassName);
+        }
+
         $url = $this->getUrl($keyIgnored);
         $start = (($start = (int) app()->request->params->get($this->startKey)) > 1) ? $start : 1;
 
