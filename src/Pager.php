@@ -381,7 +381,7 @@ final class Pager
         }
 
         // numarate first and last links?
-        if (!$this->numerateFirstLast) {
+        if ($this->numerateFirstLast) {
             $this->linksTemplate['first'] = 1;
             $this->linksTemplate['last']  = $this->totalPages;
         }
