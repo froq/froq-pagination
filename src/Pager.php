@@ -450,7 +450,6 @@ final class Pager
                 $url, $this->startKey, $this->totalPages, $this->linksTemplate['last']);
         }
 
-        // return template
         return $this->template($this->links, $linksClassName);
     }
 }
