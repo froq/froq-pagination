@@ -87,10 +87,28 @@ final class Pager
      */
     private $totalRecords;
 
+    /**
+     * Links.
+     * @var array
+     */
     private $links = [];
+
+    /**
+     * Links limit.
+     * @var int
+     */
     private $linksLimit = 5;
+
+    /**
+     * Links limit max.
+     * @var int
+     */
     private $linksLimitMax = 9;
 
+    /**
+     * Links template.
+     * @var array
+     */
     private $linksTemplate = [
         'page'  => 'Page',
         'first' => '&laquo;',
