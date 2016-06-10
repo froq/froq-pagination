@@ -124,6 +124,12 @@ final class Pager
     private $linksClassName = 'pager';
 
     /**
+     * Numarate first last.
+     * @var bool
+     */
+    private $numerateFirstLast = true;
+
+    /**
      * Aautorun.
      * @var bool
      */
@@ -242,6 +248,18 @@ final class Pager
     final public function setLinksClassName(string $linksClassName): self
     {
         $this->linksClassName = $linksClassName;
+
+        return $this;
+    }
+
+    /**
+     * Set numarate first last.
+     * @param  bool $numerateFirstLast
+     * @return self
+     */
+    final public function setNumerateFirstLast(bool $numerateFirstLast): self
+    {
+        $this->numerateFirstLast = $numerateFirstLast;
 
         return $this;
     }
