@@ -274,7 +274,7 @@ final class Pager
         $this->stop = $stop;
         $this->start = $start;
         if ($this->totalRecords) {
-            $this->totalPages = (int) ceil($this->totalRecords / $this->stop);
+            $this->setTotalPages((int) ceil($this->totalRecords / $this->stop));
         }
     }
 
