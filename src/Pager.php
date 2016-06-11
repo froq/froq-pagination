@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace Froq\Pager;
 
+use Froq\Util\Util;
 use Froq\Util\Traits\GetterTrait;
 
 /**
@@ -295,9 +296,8 @@ final class Pager
 
         // get params manipulated by developer?
         if ($this->autorun) {
-            $app = app();
-            $this->setStart((int) $app->request->params->get($this->startKey));
-            $this->setStop((int) $app->request->params->get($this->stopKey));
+            $this->setStart((int) ($_GET[$this->startKey] ?? ''));
+            $this->setStop((int) ($_GET[$this->stopKey] ?? ''));
         }
 
         $stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
@@ -338,25 +338,18 @@ final class Pager
      */
     final public function prepareCurrentUrl(string $keyIgnored = null): string
     {
-        $app = app();
+        $url = Util::getCurrentUrl(false);
 
-        $url = sprintf('%s://%s%s',
-            $app->request->uri->getScheme(),
-            $app->request->uri->getHost(),
-            $app->request->uri->getPath()
-        );
-
-        $query = $app->request->uri->getQuery();
-        if ($query) {
-            parse_str($query, $query);
+        if ($_SERVER['QUERY_STRING'] != '') {
+            parse_str($_SERVER['QUERY_STRING'], $query);
             $query = to_query_string($query, "{$this->startKey},{$keyIgnored}");
             if ($query) {
                 $query .= '&';
             }
-            $url .= '?'. $query;
+            $url .= '?'. html_encode($query);
         }
 
-        return html_encode($url);
+        return $url;
     }
 
     /**
