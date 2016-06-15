@@ -340,13 +340,15 @@ final class Pager
     {
         $url = Util::getCurrentUrl(false);
 
-        if ($_SERVER['QUERY_STRING'] != '') {
+        if (!empty($_SERVER['QUERY_STRING'])) {
             parse_str($_SERVER['QUERY_STRING'], $query);
             $query = to_query_string($query, "{$this->startKey},{$keyIgnored}");
             if ($query) {
                 $query .= '&';
             }
             $url .= '?'. html_encode($query);
+        } else {
+            $url .= '?';
         }
 
         return $url;
