@@ -133,7 +133,7 @@ final class Pager
     /**
      * Constructor.
      */
-    public final function __construct()
+    public function __construct()
     {}
 
     /**
@@ -141,7 +141,7 @@ final class Pager
      * @param  int $start
      * @return self
      */
-    public final function setStart(int $start): self
+    public function setStart(int $start): self
     {
         $this->start = abs($start);
 
@@ -153,7 +153,7 @@ final class Pager
      * @param  int $stop
      * @return self
      */
-    public final function setStop(int $stop): self
+    public function setStop(int $stop): self
     {
         $this->stop = abs($stop);
         if ($this->stop > $this->stopMax) {
@@ -168,7 +168,7 @@ final class Pager
      * @param  int $stopMax
      * @return self
      */
-    public final function setStopMax(int $stopMax): self
+    public function setStopMax(int $stopMax): self
     {
         $this->stopMax = $stopMax;
 
@@ -180,7 +180,7 @@ final class Pager
      * @param  string $startKey
      * @return self
      */
-    public final function setStartKey(string $startKey): self
+    public function setStartKey(string $startKey): self
     {
         $this->startKey = $startKey;
 
@@ -192,7 +192,7 @@ final class Pager
      * @param  string $stopKey
      * @return self
      */
-    public final function setStopKey(string $stopKey): self
+    public function setStopKey(string $stopKey): self
     {
         $this->stopKey = $stopKey;
 
@@ -204,7 +204,7 @@ final class Pager
      * @param  int $totalPages
      * @return self
      */
-    public final function setTotalPages(int $totalPages): self
+    public function setTotalPages(int $totalPages): self
     {
         $this->totalPages = abs($totalPages);
 
@@ -216,7 +216,7 @@ final class Pager
      * @param  int $totalRecords
      * @return self
      */
-    public final function setTotalRecords(int $totalRecords): self
+    public function setTotalRecords(int $totalRecords): self
     {
         $this->totalRecords = abs($totalRecords);
 
@@ -228,7 +228,7 @@ final class Pager
      * @param  int $linksLimit
      * @return self
      */
-    public final function setLinksLimit(int $linksLimit): self
+    public function setLinksLimit(int $linksLimit): self
     {
         $this->linksLimit = $linksLimit;
 
@@ -240,7 +240,7 @@ final class Pager
      * @param  array $linksTemplate
      * @return self
      */
-    public final function setLinksTemplate(array $linksTemplate): self
+    public function setLinksTemplate(array $linksTemplate): self
     {
         $this->linksTemplate = array_merge($this->linksTemplate, $linksTemplate);
 
@@ -252,7 +252,7 @@ final class Pager
      * @param  string $linksClassName
      * @return self
      */
-    public final function setLinksClassName(string $linksClassName): self
+    public function setLinksClassName(string $linksClassName): self
     {
         $this->linksClassName = $linksClassName;
 
@@ -264,7 +264,7 @@ final class Pager
      * @param  bool $numerateFirstLast
      * @return self
      */
-    public final function setNumerateFirstLast(bool $numerateFirstLast): self
+    public function setNumerateFirstLast(bool $numerateFirstLast): self
     {
         $this->numerateFirstLast = $numerateFirstLast;
 
@@ -276,7 +276,7 @@ final class Pager
      * @param  bool $autorun
      * @return self
      */
-    public final function setAutorun(bool $autorun): self
+    public function setAutorun(bool $autorun): self
     {
         $this->autorun = $autorun;
 
@@ -288,7 +288,7 @@ final class Pager
      * @param  int|null $totalRecords
      * @return array
      */
-    public final function run(int $totalRecords = null): array
+    public function run(int $totalRecords = null): array
     {
         if ($totalRecords !== null) {
             $this->setTotalRecords($totalRecords);
@@ -318,7 +318,7 @@ final class Pager
      * @param  string|null $linksClassName
      * @return string
      */
-    public final function template(array $links, string $linksClassName = null): string
+    public function template(array $links, string $linksClassName = null): string
     {
         $linksClassName = $linksClassName ?? $this->linksClassName;
 
@@ -336,7 +336,7 @@ final class Pager
      * @param  string|null $keyIgnored
      * @return string
      */
-    public final function prepareCurrentUrl(string $keyIgnored = null): string
+    public function prepareCurrentUrl(string $keyIgnored = null): string
     {
         $url = Util::getCurrentUrl(false);
 
@@ -361,7 +361,7 @@ final class Pager
      * @param  string|null $linksClassName
      * @return string
      */
-    public final function generateLinks(int $linksLimit = null, string $keyIgnored = null,
+    public function generateLinks(int $linksLimit = null, string $keyIgnored = null,
         string $linksClassName = null): string
     {
         // only one page?
@@ -467,7 +467,7 @@ final class Pager
      * @param  string      $linksClassName
      * @return string
      */
-    public final function generateLinksCenter(string $keyIgnored = null, $linksClassName = null): string
+    public function generateLinksCenter(string $keyIgnored = null, $linksClassName = null): string
     {
         if (!empty($this->links)) {
             return $this->template($this->links, $linksClassName);
