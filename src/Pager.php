@@ -333,17 +333,17 @@ final class Pager
 
     /**
      * Prepare current url.
-     * @param  string|null $keyIgnored
+     * @param  string|null $ignoredKeys
      * @return string
      */
-    public function prepareCurrentUrl(string $keyIgnored = null): string
+    public function prepareCurrentUrl(string $ignoredKeys = null): string
     {
         $url = Util::getCurrentUrl(false);
 
         if (!empty($_SERVER['QUERY_STRING'])) {
             parse_str($_SERVER['QUERY_STRING'], $query);
-            $query = to_query_string($query, "{$this->startKey},{$keyIgnored}");
-            if ($query) {
+            $query = to_query_string($query, "{$this->startKey},{$ignoredKeys}");
+            if ($query != '') {
                 $query .= '&';
             }
             $url .= '?'. html_encode($query);
@@ -357,11 +357,11 @@ final class Pager
     /**
      * Generate links.
      * @param  int|null    $linksLimit
-     * @param  string|null $keyIgnored
+     * @param  string|null $ignoredKeys
      * @param  string|null $linksClassName
      * @return string
      */
-    public function generateLinks(int $linksLimit = null, string $keyIgnored = null,
+    public function generateLinks(int $linksLimit = null, string $ignoredKeys = null,
         string $linksClassName = null): string
     {
         // only one page?
@@ -386,7 +386,7 @@ final class Pager
             $linksLimit = $this->totalPages;
         }
 
-        $url = $this->prepareCurrentUrl($keyIgnored);
+        $url = $this->prepareCurrentUrl($ignoredKeys);
         $start = max(1, $this->start / $this->stop + 1);
         $stop = $start + $linksLimit;
 
@@ -463,17 +463,17 @@ final class Pager
 
     /**
      * Generate links center.
-     * @param  string|null $keyIgnored
+     * @param  string|null $ignoredKeys
      * @param  string      $linksClassName
      * @return string
      */
-    public function generateLinksCenter(string $keyIgnored = null, $linksClassName = null): string
+    public function generateLinksCenter(string $ignoredKeys = null, $linksClassName = null): string
     {
         if (!empty($this->links)) {
             return $this->template($this->links, $linksClassName);
         }
 
-        $url = $this->prepareCurrentUrl($keyIgnored);
+        $url = $this->prepareCurrentUrl($ignoredKeys);
         $start = max(1, $this->start / $this->stop + 1);
 
         // add first & prev links
