@@ -26,8 +26,8 @@ declare(strict_types=1);
 
 namespace Froq\Pager;
 
-use Froq\Util\Util;
 use Froq\Util\Traits\GetterTrait;
+use Froq\Util\Util;
 
 /**
  * @package    Froq
@@ -299,8 +299,8 @@ final class Pager
 
         // get params manipulated by developer?
         if ($this->autorun) {
-            $this->setStart((int) ($_GET[$this->startKey] ?? ''));
-            $this->setStop((int) ($_GET[$this->stopKey] ?? ''));
+            $this->setStart((int) ($_GET[$this->startKey] ?? 0));
+            $this->setStop((int) ($_GET[$this->stopKey] ?? 0));
         }
 
         $stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
@@ -308,7 +308,7 @@ final class Pager
 
         $this->stop = $stop;
         $this->start = $start;
-        if ($this->totalRecords) {
+        if ($this->totalRecords > 0) {
             $this->setTotalPages((int) ceil($this->totalRecords / $this->stop));
         }
 
@@ -342,9 +342,10 @@ final class Pager
     public function prepareCurrentUrl(string $ignoredKeys = null): string
     {
         $url = Util::getCurrentUrl(false);
+        $urlQuery = $_SERVER['QUERY_STRING'] ?? '';
 
-        if (!empty($_SERVER['QUERY_STRING'])) {
-            parse_str($_SERVER['QUERY_STRING'], $query);
+        if ($urlQuery != '') {
+            parse_str($urlQuery, $query);
             $query = to_query_string($query, "{$this->startKey},{$ignoredKeys}");
             if ($query != '') {
                 $query .= '&';
@@ -369,9 +370,8 @@ final class Pager
     {
         // only one page?
         if ($this->totalPages == 1) {
-            return $this->template([
-                '<a class="current current-one" rel="current" href="#">1</a>'
-            ], $className);
+            return $this->template(['<a class="current current-one" rel="current" href="#">1</a>'],
+                $className);
         }
 
         if (!empty($this->links)) {
