@@ -31,6 +31,7 @@ namespace Froq\Pager;
  * @subpackage Froq\Pager
  * @object     Froq\Pager\PagerException
  * @author     Kerem Güneş <k-gun@mail.com>
+ * @since      1.0
  */
 final class PagerException extends \Exception
 {}

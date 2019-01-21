@@ -34,6 +34,7 @@ use Froq\Util\Util;
  * @subpackage Froq\Pager
  * @object     Froq\Pager\Pager
  * @author     Kerem Güneş <k-gun@mail.com>
+ * @since      1.0
  */
 final class Pager
 {
