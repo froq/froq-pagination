@@ -26,8 +26,8 @@ declare(strict_types=1);
 
 namespace Froq\Pager;
 
-use Froq\Util\Traits\GetterTrait;
 use Froq\Util\Util;
+use Froq\Util\Traits\GetTrait;
 
 /**
  * @package    Froq
@@ -40,9 +40,9 @@ final class Pager
 {
     /**
      * Getter.
-     * @object Froq\Util\Traits\GetterTrait
+     * @object Froq\Util\Traits\GetTrait
      */
-    use GetterTrait;
+    use GetTrait;
 
     /**
      * Start.
