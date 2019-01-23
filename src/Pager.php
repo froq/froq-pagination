@@ -39,7 +39,7 @@ use Froq\Util\Traits\GetTrait;
 final class Pager
 {
     /**
-     * Getter.
+     * Get trait.
      * @object Froq\Util\Traits\GetTrait
      */
     use GetTrait;
