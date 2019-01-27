@@ -27,7 +27,7 @@ declare(strict_types=1);
 namespace Froq\Pager;
 
 use Froq\Util\Util;
-use Froq\Util\Traits\GetTrait;
+use Froq\Util\Traits\{PropertyTrait, PropertyGetterTrait};
 
 /**
  * @package    Froq
@@ -40,9 +40,15 @@ final class Pager
 {
     /**
      * Get trait.
-     * @object Froq\Util\Traits\GetTrait
+     * @object Froq\Util\Traits\PropertyTrait
      */
-    use GetTrait;
+    use PropertyTrait;
+
+    /**
+     * Get trait.
+     * @object Froq\Util\Traits\PropertyGetterTrait
+     */
+    use PropertyGetterTrait;
 
     /**
      * Start.
@@ -82,13 +88,13 @@ final class Pager
 
     /**
      * Total pages.
-     * @var int|null
+     * @var int
      */
     private $totalPages;
 
     /**
      * Total records.
-     * @var int|null
+     * @var int
      */
     private $totalRecords;
 
