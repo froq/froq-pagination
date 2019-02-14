@@ -24,29 +24,29 @@
  */
 declare(strict_types=1);
 
-namespace Froq\Pager;
+namespace froq\pager;
 
-use Froq\Util\Util;
-use Froq\Util\Traits\{PropertyTrait, PropertyGetterTrait};
+use froq\util\Util;
+use froq\util\traits\{PropertyTrait, PropertyGetterTrait};
 
 /**
- * @package    Froq
- * @subpackage Froq\Pager
- * @object     Froq\Pager\Pager
- * @author     Kerem Güneş <k-gun@mail.com>
- * @since      1.0
+ * Pager.
+ * @package froq\pager
+ * @object  froq\pager\Pager
+ * @author  Kerem Güneş <k-gun@mail.com>
+ * @since   1.0
  */
 final class Pager
 {
     /**
      * Get trait.
-     * @object Froq\Util\Traits\PropertyTrait
+     * @object froq\util\traits\PropertyTrait
      */
     use PropertyTrait;
 
     /**
      * Get trait.
-     * @object Froq\Util\Traits\PropertyGetterTrait
+     * @object froq\util\traits\PropertyGetterTrait
      */
     use PropertyGetterTrait;
 
