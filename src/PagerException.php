@@ -24,14 +24,14 @@
  */
 declare(strict_types=1);
 
-namespace Froq\Pager;
+namespace froq\pager;
 
 /**
- * @package    Froq
- * @subpackage Froq\Pager
- * @object     Froq\Pager\PagerException
- * @author     Kerem Güneş <k-gun@mail.com>
- * @since      1.0
+ * Pager exception.
+ * @package froq\pager
+ * @object  froq\pager\PagerException
+ * @author  Kerem Güneş <k-gun@mail.com>
+ * @since   1.0
  */
 final class PagerException extends \Exception
 {}
