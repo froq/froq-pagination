@@ -299,8 +299,7 @@ final class Pager
         // only one page?
         $totalPages = $this->totalPages;
         if ($totalPages == 1) {
-            return $this->template(['<a class="current current-one" rel="current" href="#">1</a>'],
-                $linksClassName);
+            return $this->template(['<a class="current" rel="current" href="#">1</a>'], $linksClassName);
         }
 
         $links = (array) $this->links;
@@ -385,7 +384,7 @@ final class Pager
 
                 for ($j; $j <= $totalPages; $j++) {
                     if ($j == $start) {
-                        $links[] = '<a class="current" rel="current" href="#">'. $i .'</a>';
+                        $links[] = '<a class="current" rel="current" href="#">'. $j .'</a>';
                     } else {
                         $links[] = sprintf('<a rel="next" href="%s%s=%s">%s</a>', $url, $s, $j, $j);
                     }
@@ -411,22 +410,22 @@ final class Pager
 
     /**
      * Generate links center.
+     * @param  string|null $page
      * @param  string|null $ignoredKeys
      * @param  string      $linksClassName
      * @return string
      */
-    public function generateLinksCenter(string $ignoredKeys = null, $linksClassName = null): string
+    public function generateLinksCenter(string $page = null, string $ignoredKeys = null, $linksClassName = null): string
     {
         // only one page?
         $totalPages = $this->totalPages;
         if ($totalPages == 1) {
-            return $this->template(['<a class="current current-one" rel="current" href="#">1</a>'],
-                $linksClassName);
+            return $this->template(['<a class="current" rel="current" href="#">1</a>'], $linksClassName, true);
         }
 
         $links = (array) $this->linksCenter;
         if ($links != null) {
-            return $this->template($links, $linksClassName);
+            return $this->template($links, $linksClassName, true);
         }
 
         $linksTemplate = $this->linksTemplate;
@@ -457,7 +456,7 @@ final class Pager
         }
 
         $links[] = sprintf('<a class="current" rel="current" href="#">%s %s</a>',
-            $linksTemplate['page'], $start);
+            $page ?? $linksTemplate['page'], $start);
 
         // add next & last link
         $next = $start + 1;
@@ -471,18 +470,22 @@ final class Pager
         // store
         $this->linksCenter = $links;
 
-        return $this->template($links, $linksClassName);
+        return $this->template($links, $linksClassName, true);
     }
 
     /**
      * Template.
      * @param  array       $links
      * @param  string|null $linksClassName
+     * @param  bool        $center
      * @return string
      */
-    private function template(array $links, string $linksClassName = null): string
+    private function template(array $links, string $linksClassName = null, bool $center = false): string
     {
         $linksClassName = $linksClassName ?? $this->linksClassName;
+        if ($center) {
+            $linksClassName .= ' center';
+        }
 
         $tpl  = "<ul class=\"{$linksClassName}\">";
         foreach ($links as $link) {
