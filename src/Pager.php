@@ -505,7 +505,7 @@ final class Pager
     {
         $s = $this->startKey;
         $url = Util::getCurrentUrl(false);
-        $urlQuery = $_SERVER['QUERY_STRING'] ?? '';
+        $urlQuery = rawurldecode($_SERVER['QUERY_STRING'] ?? '');
 
         if ($urlQuery != '') {
             parse_str($urlQuery, $query);
