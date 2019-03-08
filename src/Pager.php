@@ -259,8 +259,8 @@ final class Pager
             $this->totalRecords = abs($totalRecords);
         }
 
-        $startKey && $this->startKey = $startKey;
-        $stopKey && $this->stopKey = $stopKey;
+        if ($startKey) $this->startKey = $startKey;
+        if ($stopKey) $this->stopKey = $stopKey;
 
         // get params could be manipulated by developer setting autorun false
         if ($this->autorun) {
@@ -275,6 +275,18 @@ final class Pager
         $this->start = $start;
         if ($this->totalRecords > 0) {
             $this->totalPages = abs((int) ceil($this->totalRecords / $this->stop));
+        }
+
+        // safety..
+        if (isset($_GET[$this->startKey])) {
+            $start = $_GET[$this->startKey];
+            if ($start && $start[0] == '-') {
+                $this->redirectUrl($this->prepareUrl() . $this->startKey .'='. abs($start), 301);
+            } elseif ($start > $this->totalPages) {
+                $this->redirectUrl($this->prepareUrl() . $this->startKey .'='. $this->totalPages, 307);
+            } elseif ($start == '' || $start == '0' || !ctype_digit($start)) {
+                $this->redirectUrl(trim($this->prepareUrl(), '&'), 301);
+            }
         }
 
         // fix start,stop
@@ -320,21 +332,9 @@ final class Pager
         }
 
         $s = $this->startKey;
-        $url = $this->prepareCurrentUrl($ignoredKeys);
+        $url = $this->prepareUrl($ignoredKeys);
         $start = max(1, ($this->start / $this->stop) + 1);
         $stop = $start + $linksLimit;
-
-        if ($start > $totalPages) {
-            $url = $url . $this->startKey .'='. $totalPages;
-            if (function_exists('redirect_to')) {
-                redirect_to($url, 307); // http/sugars.php
-            } elseif (!headers_sent()) {
-                header('Location: '. $url, false, 307);
-                die('Redirecting to '. htmlspecialchars($url)); // yes..
-            } else {
-                $start = $totalPages;
-            }
-        }
 
         // calculate loop
         $sub = 1;
@@ -431,20 +431,8 @@ final class Pager
         $linksTemplate = $this->linksTemplate;
 
         $s = $this->startKey;
-        $url = $this->prepareCurrentUrl($ignoredKeys);
+        $url = $this->prepareUrl($ignoredKeys);
         $start = max(1, ($this->start / $this->stop) + 1);
-
-        if ($start > $totalPages) {
-            $url = $url . $s .'='. $totalPages;
-            if (function_exists('redirect_to')) {
-                redirect_to($url, 307); // http/sugars.php
-            } elseif (!headers_sent()) {
-                header('Location: '. $url, false, 307);
-                die('Redirecting to '. htmlspecialchars($url)); // yes..
-            } else {
-                $start = $totalPages;
-            }
-        }
 
         // add first & prev links
         $prev = $start - 1;
@@ -501,7 +489,7 @@ final class Pager
      * @param  string|null $ignoredKeys
      * @return string
      */
-    private function prepareCurrentUrl(string $ignoredKeys = null): string
+    private function prepareUrl(string $ignoredKeys = null): string
     {
         $s = $this->startKey;
         $url = Util::getCurrentUrl(false);
@@ -519,5 +507,22 @@ final class Pager
         }
 
         return $url;
+    }
+
+    /**
+     * Redirect url.
+     * @param  string $url
+     * @param  int    $code
+     * @return void
+     */
+    private function redirectUrl(string $url, int $code): void
+    {
+        if (function_exists('redirect_to')) {
+            redirect_to($url, $code); // http/sugars.php
+        } elseif (!headers_sent()) {
+            header('Location: '. $url, false, $code);
+            $url = htmlspecialchars($url);
+            die('Redirecting to <a href="'. $url .'">'. $url .'</a>'); // yes..
+        }
     }
 }
