@@ -495,8 +495,8 @@ final class Pager
 
         $urlQuery = $_SERVER['QUERY_STRING'] ?? '';
         if ($urlQuery != '') {
-            $query = Util::unparseQueryString(Util::parseQueryString($urlQuery),
-                join(',', [$this->startKey, $ignoredKeys]), true);
+            $query = Util::unparseQueryString(Util::parseQueryString($urlQuery, true),
+                true, join(',', [$this->startKey, $ignoredKeys]));
             if ($query != '') {
                 $query .= '&';
             }
