@@ -491,13 +491,12 @@ final class Pager
      */
     private function prepareUrl(string $ignoredKeys = null): string
     {
-        $s = $this->startKey;
         $url = Util::getCurrentUrl(false);
-        $urlQuery = rawurldecode($_SERVER['QUERY_STRING'] ?? '');
 
+        $urlQuery = $_SERVER['QUERY_STRING'] ?? '';
         if ($urlQuery != '') {
-            parse_str($urlQuery, $query);
-            $query = to_query_string($query, "{$s},{$ignoredKeys}");
+            $query = Util::unparseQueryString(Util::parseQueryString($urlQuery),
+                join(',', [$this->startKey, $ignoredKeys]), true);
             if ($query != '') {
                 $query .= '&';
             }
