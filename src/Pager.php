@@ -281,11 +281,11 @@ final class Pager
         if (isset($_GET[$this->startKey])) {
             $start = $_GET[$this->startKey];
             if ($start && $start[0] == '-') {
-                $this->redirectUrl($this->prepareUrl() . $this->startKey .'='. abs($start), 301);
+                $this->redirect($this->prepareQuery() . $this->startKey .'='. abs($start), 301);
             } elseif ($start > $this->totalPages) {
-                $this->redirectUrl($this->prepareUrl() . $this->startKey .'='. $this->totalPages, 307);
+                $this->redirect($this->prepareQuery() . $this->startKey .'='. $this->totalPages, 307);
             } elseif ($start == '' || $start == '0' || !ctype_digit($start)) {
-                $this->redirectUrl(trim($this->prepareUrl(), '&'), 301);
+                $this->redirect(trim($this->prepareQuery(), '&'), 301);
             }
         }
 
@@ -332,7 +332,7 @@ final class Pager
         }
 
         $s = $this->startKey;
-        $url = $this->prepareUrl($ignoredKeys);
+        $query = $this->prepareQuery($ignoredKeys);
         $start = max(1, ($this->start / $this->stop) + 1);
         $stop = $start + $linksLimit;
 
@@ -355,9 +355,9 @@ final class Pager
         // add first & prev links
         $prev = $start - 1;
         if ($prev >= 1) {
-            $links[] = sprintf('<a class="first" rel="first" href="%s%s=1">%s</a>', $url, $s,
+            $links[] = sprintf('<a class="first" rel="first" href="%s%s=1">%s</a>', $query, $s,
                 $linksTemplate['first']);
-            $links[] = sprintf('<a class="prev" rel="prev" href="%s%s=%s">%s</a>', $url, $s, $prev,
+            $links[] = sprintf('<a class="prev" rel="prev" href="%s%s=%s">%s</a>', $query, $s, $prev,
                 $linksTemplate['prev']);
         }
 
@@ -373,7 +373,7 @@ final class Pager
                     } elseif ($i == $start + 1) {
                         $relPrevNext = ' rel="next"';
                     }
-                    $links[] = sprintf('<a%s href="%s%s=%s">%s</a>', $relPrevNext, $url, $s, $i, $i);
+                    $links[] = sprintf('<a%s href="%s%s=%s">%s</a>', $relPrevNext, $query, $s, $i, $i);
                 }
             } else {
                 $j = $start;
@@ -386,7 +386,7 @@ final class Pager
                     if ($j == $start) {
                         $links[] = '<a class="current" rel="current" href="#">'. $j .'</a>';
                     } else {
-                        $links[] = sprintf('<a rel="next" href="%s%s=%s">%s</a>', $url, $s, $j, $j);
+                        $links[] = sprintf('<a rel="next" href="%s%s=%s">%s</a>', $query, $s, $j, $j);
                     }
                 }
                 break;
@@ -396,9 +396,9 @@ final class Pager
         // add next & last link
         $next = $start + 1;
         if ($start != $totalPages) {
-            $links[] = sprintf('<a class="next" rel="next" href="%s%s=%s">%s</a>', $url, $s, $next,
+            $links[] = sprintf('<a class="next" rel="next" href="%s%s=%s">%s</a>', $query, $s, $next,
                 $linksTemplate['next']);
-            $links[] = sprintf('<a class="last" rel="last" href="%s%s=%s">%s</a>', $url, $s, $totalPages,
+            $links[] = sprintf('<a class="last" rel="last" href="%s%s=%s">%s</a>', $query, $s, $totalPages,
                 $linksTemplate['last']);
         }
 
@@ -431,15 +431,15 @@ final class Pager
         $linksTemplate = $this->linksTemplate;
 
         $s = $this->startKey;
-        $url = $this->prepareUrl($ignoredKeys);
+        $query = $this->prepareQuery($ignoredKeys);
         $start = max(1, ($this->start / $this->stop) + 1);
 
         // add first & prev links
         $prev = $start - 1;
         if ($prev >= 1) {
-            $links[] = sprintf('<a class="first" rel="first" href="%s%s=1">%s</a>', $url, $s,
+            $links[] = sprintf('<a class="first" rel="first" href="%s%s=1">%s</a>', $query, $s,
                 $linksTemplate['first']);
-            $links[] = sprintf('<a class="prev" rel="prev" href="%s%s=%s">%s</a>', $url, $s, $prev,
+            $links[] = sprintf('<a class="prev" rel="prev" href="%s%s=%s">%s</a>', $query, $s, $prev,
                 $linksTemplate['prev']);
         }
 
@@ -449,9 +449,9 @@ final class Pager
         // add next & last link
         $next = $start + 1;
         if ($start < $totalPages) {
-            $links[] = sprintf('<a class="next" rel="next" href="%s%s=%s">%s</a>', $url, $s, $next,
+            $links[] = sprintf('<a class="next" rel="next" href="%s%s=%s">%s</a>', $query, $s, $next,
                 $linksTemplate['next']);
-            $links[] = sprintf('<a class="last" rel="last" href="%s%s=%s">%s</a>', $url, $s, $totalPages,
+            $links[] = sprintf('<a class="last" rel="last" href="%s%s=%s">%s</a>', $query, $s, $totalPages,
                 $linksTemplate['last']);
         }
 
@@ -485,43 +485,39 @@ final class Pager
     }
 
     /**
-     * Prepare current url.
+     * Prepare query.
      * @param  string|null $ignoredKeys
      * @return string
      */
-    private function prepareUrl(string $ignoredKeys = null): string
+    private function prepareQuery(string $ignoredKeys = null): string
     {
-        $url = Util::getCurrentUrl(false);
-
-        $urlQuery = $_SERVER['QUERY_STRING'] ?? '';
-        if ($urlQuery != '') {
-            $query = Util::unparseQueryString(Util::parseQueryString($urlQuery, true),
+        $query = trim($_SERVER['QUERY_STRING'] ?? '');
+        if ($query != '') {
+            $query = Util::unparseQueryString(Util::parseQueryString($query, true),
                 true, join(',', [$this->startKey, $ignoredKeys]));
             if ($query != '') {
                 $query .= '&';
             }
-            $url .= '?'. html_encode($query);
+            return '?'. html_encode($query);
         } else {
-            $url .= '?';
+            return '?';
         }
-
-        return $url;
     }
 
     /**
-     * Redirect url.
-     * @param  string $url
+     * Redirect.
+     * @param  string $location
      * @param  int    $code
      * @return void
      */
-    private function redirectUrl(string $url, int $code): void
+    private function redirect(string $location, int $code): void
     {
         if (function_exists('redirect_to')) {
-            redirect_to($url, $code); // http/sugars.php
+            redirect_to($location, $code); // http/sugars.php
         } elseif (!headers_sent()) {
-            header('Location: '. $url, false, $code);
-            $url = htmlspecialchars($url);
-            die('Redirecting to <a href="'. $url .'">'. $url .'</a>'); // yes..
+            header('Location: '. $location, false, $code);
+            $location = htmlspecialchars($location);
+            die('Redirecting to <a href="'. $location .'">'. $location .'</a>'); // yes..
         }
     }
 }
