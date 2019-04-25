@@ -311,7 +311,7 @@ final class Pager
         // only one page?
         $totalPages = $this->totalPages;
         if ($totalPages == 1) {
-            return $this->template(['<a class="current" rel="current" href="#">1</a>'], $linksClassName);
+            return $this->template(['<a class="current" href="#">1</a>'], $linksClassName);
         }
 
         $links = (array) $this->links;
@@ -365,7 +365,7 @@ final class Pager
         for ($i; $i < $loop; $i++) {
             if ($loop <= $totalPages) {
                 if ($i == $start) {
-                    $links[] = '<a class="current" rel="current" href="#">'. $i .'</a>';
+                    $links[] = '<a class="current" href="#">'. $i .'</a>';
                 } else {
                     $relPrevNext = '';
                     if ($i == $start - 1) {
@@ -384,7 +384,7 @@ final class Pager
 
                 for ($j; $j <= $totalPages; $j++) {
                     if ($j == $start) {
-                        $links[] = '<a class="current" rel="current" href="#">'. $j .'</a>';
+                        $links[] = '<a class="current" href="#">'. $j .'</a>';
                     } else {
                         $links[] = sprintf('<a rel="next" href="%s%s=%s">%s</a>', $query, $s, $j, $j);
                     }
@@ -420,7 +420,7 @@ final class Pager
         // only one page?
         $totalPages = $this->totalPages;
         if ($totalPages == 1) {
-            return $this->template(['<a class="current" rel="current" href="#">1</a>'], $linksClassName, true);
+            return $this->template(['<a class="current" href="#">1</a>'], $linksClassName, true);
         }
 
         $links = (array) $this->linksCenter;
@@ -443,7 +443,7 @@ final class Pager
                 $linksTemplate['prev']);
         }
 
-        $links[] = sprintf('<a class="current" rel="current" href="#">%s %s</a>',
+        $links[] = sprintf('<a class="current" href="#">%s %s</a>',
             $page ?? $linksTemplate['page'], $start);
 
         // add next & last link
