@@ -132,10 +132,18 @@ final class Pager
     private $numerateFirstLast = false;
 
     /**
+     * Arg sep.
+     * @var string
+     */
+    private $argSep;
+
+    /**
      * Constructor.
      */
     public function __construct()
-    {}
+    {
+        $this->argSep = ini_get('arg_separator.output') ?: '&';
+    }
 
     /**
      * Set magic.
@@ -262,10 +270,13 @@ final class Pager
         if ($startKey) $this->startKey = $startKey;
         if ($stopKey) $this->stopKey = $stopKey;
 
-        // get params could be manipulated by developer setting autorun false
+        $startValue = $_GET[$this->startKey] ?? null;
+        $stopValue = $_GET[$this->stopKey] ?? null;
+
+        // get params could be manipulated by developer (setting autorun false)
         if ($this->autorun) {
-            $this->start = abs($_GET[$this->startKey] ?? 0);
-            $this->stop = abs($_GET[$this->stopKey] ?? 0);
+            $this->start = abs($startValue);
+            $this->stop = abs($stopValue);
         }
 
         $stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
@@ -277,15 +288,23 @@ final class Pager
             $this->totalPages = abs((int) ceil($this->totalRecords / $this->stop));
         }
 
-        // safety..
-        if (isset($_GET[$this->startKey])) {
-            $start = $_GET[$this->startKey];
-            if ($start && $start[0] == '-') {
-                $this->redirect($this->prepareQuery() . $this->startKey .'='. abs($start), 301);
-            } elseif ($start > $this->totalPages) {
+        // safety
+        if ($startValue !== null) {
+            if ($startValue > $this->totalPages) {
                 $this->redirect($this->prepareQuery() . $this->startKey .'='. $this->totalPages, 307);
-            } elseif ($start == '' || $start == '0' || !ctype_digit($start)) {
-                $this->redirect(trim($this->prepareQuery(), '&'), 301);
+            } elseif ($startValue && $startValue[0] == '-') {
+                $this->redirect($this->prepareQuery() . $this->startKey .'='. abs($startValue), 301);
+            } elseif ($startValue === '' || $startValue === '0' || !ctype_digit($startValue)) {
+                $this->redirect(trim($this->prepareQuery(), $this->argSep), 301);
+            }
+        }
+        if ($stopValue !== null) {
+            if ($stopValue > $this->stopMax) {
+                $this->redirect($this->prepareQuery($this->stopKey) . $this->stopKey .'='. $this->stopMax, 307);
+            } elseif ($stopValue && $stopValue[0] == '-') {
+                $this->redirect($this->prepareQuery($this->stopKey) . $this->stopKey .'='. abs($stopValue), 301);
+            } elseif ($stopValue === '' || $stopValue === '0' || !ctype_digit($stopValue)) {
+                $this->redirect(trim($this->prepareQuery(), $this->argSep), 301);
             }
         }
 
@@ -496,7 +515,7 @@ final class Pager
             $query = Util::unparseQueryString(Util::parseQueryString($query, true),
                 true, join(',', [$this->startKey, $ignoredKeys]));
             if ($query != '') {
-                $query .= '&';
+                $query .= $this->argSep;
             }
             return '?'. html_encode($query);
         } else {
