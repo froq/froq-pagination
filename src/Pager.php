@@ -139,9 +139,16 @@ final class Pager
 
     /**
      * Constructor.
+     * @param array $properties
      */
-    public function __construct()
+    public function __construct(array $properties = null)
     {
+        if ($properties != null) {
+            foreach ($properties as $name => $value) {
+                $this->setProperty($name, $value);
+            }
+        }
+
         $this->argSep = ini_get('arg_separator.output') ?: '&';
     }
 
