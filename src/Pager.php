@@ -291,6 +291,7 @@ final class Pager
 
         $this->stop = $stop;
         $this->start = $start;
+        $this->totalPages = 1;
         if ($this->totalRecords > 0) {
             $this->totalPages = abs((int) ceil($this->totalRecords / $this->stop));
         }
@@ -334,8 +335,14 @@ final class Pager
     public function generateLinks(int $linksLimit = null, string $ignoredKeys = null,
         string $linksClassName = null): string
     {
-        // only one page?
         $totalPages = $this->totalPages;
+
+        // called run()?
+        if ($totalPages === null) {
+            throw new PagerException('No pages to generate links');
+        }
+
+        // only one page?
         if ($totalPages == 1) {
             return $this->template(['<a class="current" href="#">1</a>'], $linksClassName);
         }
@@ -443,8 +450,14 @@ final class Pager
      */
     public function generateLinksCenter(string $page = null, string $ignoredKeys = null, $linksClassName = null): string
     {
-        // only one page?
         $totalPages = $this->totalPages;
+
+        // called run()?
+        if ($totalPages === null) {
+            throw new PagerException('No pages to generate links');
+        }
+
+        // only one page?
         if ($totalPages == 1) {
             return $this->template(['<a class="current" href="#">1</a>'], $linksClassName, true);
         }
