@@ -551,9 +551,10 @@ final class Pager
      */
     private function redirect(string $location, int $code): void
     {
-        if (function_exists('redirect_with')) {
-            redirect_with($location, $code); // http/sugars.php
+        if (function_exists('redirect')) {
+            redirect($location, $code); // http/sugars.php
         } elseif (!headers_sent()) {
+            $location = trim($location);
             header('Location: '. $location, false, $code);
             $location = htmlspecialchars($location);
             die('Redirecting to <a href="'. $location .'">'. $location .'</a>'); // yes..
