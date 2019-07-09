@@ -44,7 +44,7 @@ final class Pager
     private $start = 0;
 
     /**
-     * Stop.
+     * Stop (limit or per page).
      * @var int
      */
     private $stop = 10;
@@ -196,7 +196,7 @@ final class Pager
 
         // forbid start & stop
         if (in_array($name, ['start', 'stop'])) {
-            throw new PagerException("Not allowed property '{$name}' to set");
+            throw new PagerException("No allowed property '{$name}' to set");
         }
 
         static $intProperties = ['stopMax', 'stopDefault', 'totalPages', 'totalRecords', 'linksLimit'];
@@ -204,7 +204,7 @@ final class Pager
 
         if (in_array($name, $intProperties)) {
             $value = (int) abs($value);
-        } elseif (is_array($name, $boolProperties)) {
+        } elseif (in_array($name, $boolProperties)) {
             $value = (bool) $value;
         }
 
@@ -244,21 +244,21 @@ final class Pager
     }
 
     /**
-     * Get limit (stop alias).
-     * @return int
-     */
-    public function getLimit(): int
-    {
-        return $this->stop;
-    }
-
-    /**
      * Get offset (start alias).
      * @return int
      */
     public function getOffset(): int
     {
         return $this->start;
+    }
+
+    /**
+     * Get limit (stop alias).
+     * @return int
+     */
+    public function getLimit(): int
+    {
+        return $this->stop;
     }
 
     /**
