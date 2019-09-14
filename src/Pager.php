@@ -539,9 +539,9 @@ final class Pager
             if ($query != '') {
                 $query .= $this->argSep;
             }
-            return $path .'?'. html_encode($query);
+            return html_encode($path) .'?'. html_encode($query);
         } else {
-            return $path .'?';
+            return html_encode($path) .'?';
         }
     }
 
