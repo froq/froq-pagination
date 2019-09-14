@@ -530,16 +530,18 @@ final class Pager
      */
     private function prepareQuery(string $ignoredKeys = null): string
     {
-        $query = trim($_SERVER['QUERY_STRING'] ?? '');
+        $tmp = explode('?', $_SERVER['REQUEST_URI'], 2);
+        $path = $tmp[0];
+        $query = trim($tmp[1] ?? '');
         if ($query != '') {
             $query = Util::unparseQueryString(Util::parseQueryString($query, true),
                 true, join(',', [$this->startKey, $ignoredKeys]));
             if ($query != '') {
                 $query .= $this->argSep;
             }
-            return '?'. html_encode($query);
+            return $path .'?'. html_encode($query);
         } else {
-            return '?';
+            return $path .'?';
         }
     }
 
@@ -552,7 +554,7 @@ final class Pager
     private function redirect(string $location, int $code): void
     {
         if (function_exists('redirect')) {
-            redirect($location, $code); // http/sugars.php
+            redirect($location, $code); // froq-http/sugars.php
         } elseif (!headers_sent()) {
             $location = trim($location);
             header('Location: '. $location, false, $code);
