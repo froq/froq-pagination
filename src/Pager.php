@@ -264,11 +264,12 @@ final class Pager
     /**
      * Run.
      * @param  int|null    $totalRecords
+     * @param  int|null    $limit
      * @param  string|null $startKey
      * @param  string|null $stopKey
      * @return array
      */
-    public function run(int $totalRecords = null, string $startKey = null, string $stopKey = null): array
+    public function run(int $totalRecords = null, int $limit = null, string $startKey = null, string $stopKey = null): array
     {
         if ($totalRecords !== null) {
             $this->totalRecords = abs($totalRecords);
@@ -278,7 +279,11 @@ final class Pager
         if ($stopKey) $this->stopKey = $stopKey;
 
         $startValue = $_GET[$this->startKey] ?? null;
-        $stopValue = $_GET[$this->stopKey] ?? null;
+        if ($limit !== null) {
+            $stopValue = $limit; // skip GET parameter
+        } else {
+            $stopValue = $_GET[$this->stopKey] ?? null;
+        }
 
         // get params could be manipulated by developer (setting autorun false)
         if ($this->autorun) {
@@ -302,7 +307,7 @@ final class Pager
                 $this->redirect($this->prepareQuery() . $this->startKey .'='. $this->totalPages, 307);
             } elseif ($startValue && $startValue[0] == '-') {
                 $this->redirect($this->prepareQuery() . $this->startKey .'='. abs($startValue), 301);
-            } elseif ($startValue === '' || $startValue === '0' || !ctype_digit($startValue)) {
+            } elseif ($startValue === '' || $startValue === '0' || !ctype_digit((string) $startValue)) {
                 $this->redirect(trim($this->prepareQuery(), $this->argSep), 301);
             }
         }
@@ -311,7 +316,7 @@ final class Pager
                 $this->redirect($this->prepareQuery($this->stopKey) . $this->stopKey .'='. $this->stopMax, 307);
             } elseif ($stopValue && $stopValue[0] == '-') {
                 $this->redirect($this->prepareQuery($this->stopKey) . $this->stopKey .'='. abs($stopValue), 301);
-            } elseif ($stopValue === '' || $stopValue === '0' || !ctype_digit($stopValue)) {
+            } elseif ($stopValue === '' || $stopValue === '0' || !ctype_digit((string) $stopValue)) {
                 $this->redirect(trim($this->prepareQuery(), $this->argSep), 301);
             }
         }
