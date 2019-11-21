@@ -1,15 +1,15 @@
 {
     "name": "froq/froq-pager",
     "homepage": "https://github.com/froq/froq-pager",
-    "description": "Pager module for Froq!",
+    "description": "Froq! Pager.",
     "keywords": ["froq", "pager"],
     "license": "MIT",
     "authors": [
         {"name": "Kerem Güneş", "email": "k-gun@mail.com"}
     ],
     "require": {
-        "php": "^7.2",
-        "froq/froq-util": "^3.0"
+        "php": "^7.4",
+        "froq/froq": "^4.0"
     },
     "autoload": {
         "classmap": ["src/"]
