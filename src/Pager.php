@@ -26,7 +26,9 @@ declare(strict_types=1);
 
 namespace froq\pager;
 
-use froq\util\Util;
+use froq\logger\PagerException;
+use froq\traits\AttributeTrait;
+use froq\Util;
 
 /**
  * Pager.
@@ -38,118 +40,51 @@ use froq\util\Util;
 final class Pager
 {
     /**
-     * Start.
-     * @var int
+     * Attribute trait.
+     * @object froq\traits\AttributeTrait
+     * @since  4.0
      */
-    private $start = 0;
+    use AttributeTrait;
 
     /**
-     * Stop (limit or per page).
-     * @var int
-     */
-    private $stop = 10;
-
-    /**
-     * Stop max.
-     * @var int
-     */
-    private $stopMax = 1000;
-
-    /**
-     * Stop default.
-     * @var int
-     */
-    private $stopDefault = 10;
-
-    /**
-     * Start key.
-     * @var string
-     */
-    private $startKey = 's';
-
-    /**
-     * Stop key.
-     * @var string
-     */
-    private $stopKey = 'ss';
-
-    /**
-     * Total pages.
-     * @var int
-     */
-    private $totalPages = null;
-
-    /**
-     * Total records.
-     * @var int
-     */
-    private $totalRecords = null;
-
-    /**
-     * Links.
+     * Attributes default.
      * @var array
      */
-    private $links = [];
-
-    /**
-     * Links center.
-     * @var array
-     */
-    private $linksCenter = [];
-
-    /**
-     * Links limit.
-     * @var int
-     */
-    private $linksLimit = 5;
-
-    /**
-     * Links template.
-     * @var array
-     */
-    private $linksTemplate = [
-        'page'  => 'Page',
-        'first' => '&laquo;',  'prev' => '&lsaquo;',
-        'next'  => '&rsaquo;', 'last' => '&raquo;',
+    private static array $attributesDefault = [
+        'start'             => 0,
+        'stop'              => 10, // Limit or per-page.
+        'stopMax'           => 1000,
+        'stopDefault'       => 10,
+        'startKey'          => 's',  // GET param key of start.
+        'stopKey'           => 'ss', // GET param key of stop.
+        'totalPages'        => null,
+        'totalRecords'      => null,
+        'links'             => [],   // Generated links.
+        'linksCenter'       => [],   // Generated links (center aligned).
+        'linksLimit'        => 5,
+        'linksTemplate'     => [
+            'page'  => 'Page',
+            'first' => '&laquo;',  'prev' => '&lsaquo;',
+            'next'  => '&rsaquo;', 'last' => '&raquo;',
+        ],
+        'linksClassName'    => 'pager',
+        'autorun'           => true,
+        'numerateFirstLast' => false,
+        'argSep'            => '',
     ];
 
-    /**
-     * Links class name.
-     * @var string
-     */
-    private $linksClassName = 'pager';
-
-    /**
-     * Autorun.
-     * @var bool
-     */
-    private $autorun = true;
-
-    /**
-     * Numarate first last.
-     * @var bool
-     */
-    private $numerateFirstLast = false;
-
-    /**
-     * Arg sep.
-     * @var string
-     */
-    private $argSep;
 
     /**
      * Constructor.
-     * @param array $properties
+     * @param array|null $attributes
      */
-    public function __construct(array $properties = null)
+    public function __construct(array $attributes = null)
     {
-        if ($properties != null) {
-            foreach ($properties as $name => $value) {
-                $this->setProperty($name, $value);
-            }
-        }
+        $attributes['argSep'] ??= ini('arg_separator.output', '&');
 
-        $this->argSep = ini_get('arg_separator.output') ?: '&';
+        foreach ($attributes as $name => $value) {
+            $this->setAttribute($name, $value);
+        }
     }
 
     /**
@@ -161,7 +96,7 @@ final class Pager
      */
     public function __set(string $name, $value)
     {
-        $this->setProperty($name, $value);
+        $this->setAttribute($name, $value);
     }
 
     /**
@@ -172,75 +107,7 @@ final class Pager
      */
     public function __get(string $name)
     {
-        return $this->getProperty($name);
-    }
-
-    /**
-     * Set property.
-     * @param  string $name
-     * @return any    $value
-     * @return self
-     * @since  3.0
-     */
-    public function setProperty(string $name, $value): self
-    {
-        if (strpos($name, '_')) { // camelize
-            $name = preg_replace_callback('~_([a-z])~', function($match) {
-                return ucfirst($match[1]);
-            }, strtolower($name));
-        }
-
-        if (!property_exists($this, $name)) {
-            throw new PagerException("No property found such '{$name}'");
-        }
-
-        // forbid start & stop
-        if (in_array($name, ['start', 'stop'])) {
-            throw new PagerException("No allowed property '{$name}' to set");
-        }
-
-        static $intProperties = ['stopMax', 'stopDefault', 'totalPages', 'totalRecords', 'linksLimit'];
-        static $boolProperties = ['autorun', 'numerateFirstLast'];
-
-        if (in_array($name, $intProperties)) {
-            $value = (int) abs($value);
-        } elseif (in_array($name, $boolProperties)) {
-            $value = (bool) $value;
-        }
-
-        if ($name == 'stop' && $value > $this->stopMax) {
-            $value = $this->stopMax;
-        }
-
-        $this->{$name} = $value;
-
-        return $this;
-    }
-
-    /**
-     * Get property.
-     * @param  string $name
-     * @return any|null
-     * @since  3.0
-     */
-    public function getProperty(string $name)
-    {
-        if (strpos($name, '_')) { // camelize
-            $name = preg_replace_callback('~_([a-z])~', function($match) {
-                return ucfirst($match[1]);
-            }, strtolower($name));
-        }
-
-        // aliases
-        if (in_array($name, ['limit', 'offset'])) {
-            $name = ($name == 'limit') ? 'stop' : 'start';
-        }
-
-        if (!property_exists($this, $name)) {
-            throw new PagerException("No property found such '{$name}'");
-        }
-
-        return $this->{$name};
+        return $this->getAttribute($name);
     }
 
     /**
@@ -249,7 +116,7 @@ final class Pager
      */
     public function getOffset(): int
     {
-        return $this->start;
+        return $this->getAttribute('start');
     }
 
     /**
@@ -258,7 +125,7 @@ final class Pager
      */
     public function getLimit(): int
     {
-        return $this->stop;
+        return $this->getAttribute('stop');
     }
 
     /**
@@ -269,7 +136,8 @@ final class Pager
      * @param  string|null $stopKey
      * @return array
      */
-    public function run(int $totalRecords = null, int $limit = null, string $startKey = null, string $stopKey = null): array
+    public function run(int $totalRecords = null, int $limit = null, string $startKey = null,
+        string $stopKey = null): array
     {
         if ($totalRecords !== null) {
             $this->totalRecords = abs($totalRecords);
@@ -280,12 +148,12 @@ final class Pager
 
         $startValue = $_GET[$this->startKey] ?? null;
         if ($limit !== null) {
-            $stopValue = $limit; // skip GET parameter
+            $stopValue = $limit; // Skip GET parameter.
         } else {
             $stopValue = $_GET[$this->stopKey] ?? null;
         }
 
-        // get params could be manipulated by developer (setting autorun false)
+        // Get params could be manipulated by developer (setting autorun false).
         if ($this->autorun) {
             $this->start = abs($startValue);
             $this->stop = abs($stopValue);
@@ -301,7 +169,7 @@ final class Pager
             $this->totalPages = abs((int) ceil($this->totalRecords / $this->stop));
         }
 
-        // safety
+        // Safety.
         if ($startValue !== null) {
             if ($startValue > $this->totalPages) {
                 $this->redirect($this->prepareQuery() . $this->startKey .'='. $this->totalPages, 307);
@@ -321,7 +189,7 @@ final class Pager
             }
         }
 
-        // fix start,stop
+        // Fix start/stop.
         if ($this->totalRecords == 1) {
             $this->stop = 1;
             $this->start = 0;
@@ -342,12 +210,12 @@ final class Pager
     {
         $totalPages = $this->totalPages;
 
-        // called run()?
+        // Called run()?.
         if ($totalPages === null) {
-            throw new PagerException('No pages to generate links');
+            throw new PagerException('No pages to generate links, call run() first');
         }
 
-        // only one page?
+        // Only one page?.
         if ($totalPages == 1) {
             return $this->template(['<a class="current" href="#">1</a>'], $linksClassName);
         }
@@ -374,7 +242,7 @@ final class Pager
         $start = max(1, ($this->start / $this->stop) + 1);
         $stop = $start + $linksLimit;
 
-        // calculate loop
+        // Calculate loop.
         $sub = 1;
         $middle = ceil($linksLimit / 2);
         $middleSub = $middle - $sub;
@@ -383,14 +251,14 @@ final class Pager
             $loop = $stop - $middleSub;
         } else {
             $i = $sub;
-            $loop = $start == $middleSub ? $stop - $sub : $stop;
+            $loop = ($start == $middleSub) ? $stop - $sub : $stop;
             if ($loop >= $linksLimit) {
                 $diff = $loop - $linksLimit;
                 $loop = $loop - $diff + $sub;
             }
         }
 
-        // add first & prev links
+        // Add first & prev links.
         $prev = $start - 1;
         if ($prev >= 1) {
             $links[] = sprintf('<a class="first" rel="first" href="%s%s=1">%s</a>', $query, $s,
@@ -399,7 +267,7 @@ final class Pager
                 $linksTemplate['prev']);
         }
 
-        // add numbered links
+        // Add numbered links.
         for ($i; $i < $loop; $i++) {
             if ($loop <= $totalPages) {
                 if ($i == $start) {
@@ -431,7 +299,7 @@ final class Pager
             }
         }
 
-        // add next & last link
+        // Add next & last link.
         $next = $start + 1;
         if ($start != $totalPages) {
             $links[] = sprintf('<a class="next" rel="next" href="%s%s=%s">%s</a>', $query, $s, $next,
@@ -440,7 +308,7 @@ final class Pager
                 $linksTemplate['last']);
         }
 
-        // store
+        // Store.
         $this->links = $links;
 
         return $this->template($links, $linksClassName);
@@ -453,16 +321,17 @@ final class Pager
      * @param  string      $linksClassName
      * @return string
      */
-    public function generateLinksCenter(string $page = null, string $ignoredKeys = null, $linksClassName = null): string
+    public function generateLinksCenter(string $page = null, string $ignoredKeys = null,
+        $linksClassName = null): string
     {
         $totalPages = $this->totalPages;
 
-        // called run()?
+        // Called run()?.
         if ($totalPages === null) {
-            throw new PagerException('No pages to generate links');
+            throw new PagerException('No pages to generate links, call run() first');
         }
 
-        // only one page?
+        // Only one page?.
         if ($totalPages == 1) {
             return $this->template(['<a class="current" href="#">1</a>'], $linksClassName, true);
         }
@@ -478,7 +347,7 @@ final class Pager
         $query = $this->prepareQuery($ignoredKeys);
         $start = max(1, ($this->start / $this->stop) + 1);
 
-        // add first & prev links
+        // Add first & prev links.
         $prev = $start - 1;
         if ($prev >= 1) {
             $links[] = sprintf('<a class="first" rel="first" href="%s%s=1">%s</a>', $query, $s,
@@ -487,10 +356,9 @@ final class Pager
                 $linksTemplate['prev']);
         }
 
-        $links[] = sprintf('<a class="current" href="#">%s %s</a>',
-            $page ?? $linksTemplate['page'], $start);
+        $links[] = sprintf('<a class="current" href="#">%s %s</a>', $page ?? $linksTemplate['page'], $start);
 
-        // add next & last link
+        // Add next & last link.
         $next = $start + 1;
         if ($start < $totalPages) {
             $links[] = sprintf('<a class="next" rel="next" href="%s%s=%s">%s</a>', $query, $s, $next,
@@ -499,7 +367,7 @@ final class Pager
                 $linksTemplate['last']);
         }
 
-        // store
+        // Store.
         $this->linksCenter = $links;
 
         return $this->template($links, $linksClassName, true);
@@ -535,15 +403,18 @@ final class Pager
      */
     private function prepareQuery(string $ignoredKeys = null): string
     {
-        $tmp = explode('?', $_SERVER['REQUEST_URI'], 2);
+        $tmp = explode('?', $_SERVER['REQUEST_URI'] ?? '', 2);
         $path = $tmp[0];
         $query = trim($tmp[1] ?? '');
+
         if ($query != '') {
-            $query = Util::unparseQueryString(Util::parseQueryString($query, true),
-                true, join(',', [$this->startKey, $ignoredKeys]));
+            $query = Util::unparseQueryString(Util::parseQueryString($query, true), true,
+                join(',', [$this->startKey, $ignoredKeys]));
+
             if ($query != '') {
                 $query .= $this->argSep;
             }
+
             return html_encode($path) .'?'. html_encode($query);
         } else {
             return html_encode($path) .'?';
@@ -552,19 +423,24 @@ final class Pager
 
     /**
      * Redirect.
-     * @param  string $location
+     * @param  string $to
      * @param  int    $code
      * @return void
      */
-    private function redirect(string $location, int $code): void
+    private function redirect(string $to, int $code): void
     {
+        $to = trim($to);
+
+        // Comes from sugars/http.php.
         if (function_exists('redirect')) {
-            redirect($location, $code); // froq-http/sugars.php
+            redirect($to, $code);
         } elseif (!headers_sent()) {
-            $location = trim($location);
-            header('Location: '. $location, false, $code);
-            $location = htmlspecialchars($location);
-            die('Redirecting to <a href="'. $location .'">'. $location .'</a>'); // yes..
+            header('Location: '. $to, false, $code);
+
+            $to = htmlspecialchars($to);
+
+            // Yes..
+            die('Redirecting to <a href="'. $to .'">'. $to .'</a>');
         }
     }
 }
