@@ -28,7 +28,7 @@ namespace froq\pager;
 
 use froq\logger\PagerException;
 use froq\traits\AttributeTrait;
-use froq\Util;
+use froq\util\Util;
 
 /**
  * Pager.
