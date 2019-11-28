@@ -88,7 +88,7 @@ final class Pager
     }
 
     /**
-     * Set magic.
+     * Set.
      * @param  string $name
      * @param  any    $value
      * @return void
@@ -100,7 +100,7 @@ final class Pager
     }
 
     /**
-     * Get magic.
+     * Get.
      * @param  string $name
      * @return any|null
      * @since  3.0
