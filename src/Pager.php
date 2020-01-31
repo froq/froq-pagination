@@ -26,9 +26,9 @@ declare(strict_types=1);
 
 namespace froq\pager;
 
-use froq\logger\PagerException;
-use froq\traits\AttributeTrait;
+use froq\common\traits\AttributeTrait;
 use froq\util\Util;
+use froq\pager\PagerException;
 
 /**
  * Pager.
@@ -41,8 +41,9 @@ final class Pager
 {
     /**
      * Attribute trait.
-     * @object froq\traits\AttributeTrait
-     * @since  4.0
+     *
+     * @see froq\common\traits\AttributeTrait
+     * @since 4.0
      */
     use AttributeTrait;
 
