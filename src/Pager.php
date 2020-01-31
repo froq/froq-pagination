@@ -327,7 +327,7 @@ final class Pager
     {
         $totalPages = $this->totalPages;
 
-        // Called run()?.
+        // Called run()?
         if ($totalPages === null) {
             throw new PagerException('No pages to generate links, call run() first');
         }
@@ -409,16 +409,19 @@ final class Pager
         $query = trim($tmp[1] ?? '');
 
         if ($query != '') {
-            $query = Util::unparseQueryString(Util::parseQueryString($query, true), true,
-                join(',', [$this->startKey, $ignoredKeys]));
+            $query = Util::unparseQueryString(
+                Util::parseQueryString($query, true),
+                true,
+                join(',', [$this->startKey, $ignoredKeys])
+            );
 
             if ($query != '') {
                 $query .= $this->argSep;
             }
 
-            return html_encode($path) .'?'. html_encode($query);
+            return $this->escape($path) .'?'. $this->escape($query);
         } else {
-            return html_encode($path) .'?';
+            return $this->escape($path) .'?';
         }
     }
 
@@ -436,12 +439,23 @@ final class Pager
         if (function_exists('redirect')) {
             redirect($to, $code);
         } elseif (!headers_sent()) {
-            header('Location: '. $to, false, $code);
+            $to = $this->escape($to);
 
-            $to = htmlspecialchars($to);
+            header('Location: '. $to, false, $code);
 
             // Yes..
             die('Redirecting to <a href="'. $to .'">'. $to .'</a>');
         }
+    }
+
+    /**
+     * Escape.
+     * @param  string $input
+     * @return string
+     * @since  4.0
+     */
+    private function escape(string $input): string
+    {
+        return str_replace(["'", '"', '<', '>'], ['&#39;', '&#34;', '&lt;', '&gt;'], $input);
     }
 }
