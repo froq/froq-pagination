@@ -81,7 +81,7 @@ final class Pager
      */
     public function __construct(array $attributes = null)
     {
-        $attributes['argSep'] ??= ini('arg_separator.output', '&');
+        $attributes['argSep'] ??= ini_get('arg_separator.output') ?: '&';
 
         foreach ($attributes as $name => $value) {
             $this->setAttribute($name, $value);
