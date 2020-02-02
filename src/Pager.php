@@ -69,8 +69,8 @@ final class Pager
             'next'  => '&rsaquo;', 'last' => '&raquo;',
         ],
         'linksClassName'    => 'pager',
-        'autorun'           => true,
         'numerateFirstLast' => false,
+        'autorun'           => true,
         'argSep'            => '',
     ];
 
@@ -135,7 +135,7 @@ final class Pager
      * @param  int|null    $limit
      * @param  string|null $startKey
      * @param  string|null $stopKey
-     * @return array
+     * @return array<int>
      */
     public function run(int $totalRecords = null, int $limit = null, string $startKey = null,
         string $stopKey = null): array
@@ -144,14 +144,14 @@ final class Pager
             $this->totalRecords = abs($totalRecords);
         }
 
-        if ($startKey) $this->startKey = $startKey;
-        if ($stopKey) $this->stopKey = $stopKey;
+        $startKey && $this->startKey = $startKey;
+        $stopKey && $this->stopKey = $stopKey;
 
         $startValue = $_GET[$this->startKey] ?? null;
-        if ($limit !== null) {
-            $stopValue = $limit; // Skip GET parameter.
-        } else {
+        if ($limit === null) {
             $stopValue = $_GET[$this->stopKey] ?? null;
+        } else {
+            $stopValue = $limit; // Skip GET parameter.
         }
 
         // Get params could be manipulated by developer (setting autorun false).
@@ -160,11 +160,9 @@ final class Pager
             $this->stop = abs($stopValue);
         }
 
-        $stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
-        $start = ($this->start > 1) ? ($this->start * $stop) - $stop : 0;
+        $this->stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
+        $this->start = ($this->start > 1) ? ($this->start * $this->stop) - $this->stop : 0;
 
-        $this->stop = $stop;
-        $this->start = $start;
         $this->totalPages = 1;
         if ($this->totalRecords > 0) {
             $this->totalPages = abs((int) ceil($this->totalRecords / $this->stop));
@@ -206,12 +204,11 @@ final class Pager
      * @param  string|null $linksClassName
      * @return string
      */
-    public function generateLinks(int $linksLimit = null, string $ignoredKeys = null,
-        string $linksClassName = null): string
+    public function generateLinks(int $linksLimit = null, string $ignoredKeys = null, string $linksClassName = null): string
     {
         $totalPages = $this->totalPages;
 
-        // Called run()?.
+        // Called run()?
         if ($totalPages === null) {
             throw new PagerException('No pages to generate links, call run() first');
         }
@@ -228,9 +225,9 @@ final class Pager
 
         $linksTemplate = $this->linksTemplate;
         $numerateFirstLast = $this->numerateFirstLast;
-        if (!$numerateFirstLast) {
+        if ($numerateFirstLast) {
             $linksTemplate['first'] = 1;
-            $linksTemplate['last']  = $totalPages;
+            $linksTemplate['last'] = $totalPages;
         }
 
         $linksLimit = $linksLimit ?? $this->linksLimit;
@@ -322,8 +319,7 @@ final class Pager
      * @param  string      $linksClassName
      * @return string
      */
-    public function generateLinksCenter(string $page = null, string $ignoredKeys = null,
-        $linksClassName = null): string
+    public function generateLinksCenter(string $page = null, string $ignoredKeys = null, $linksClassName = null): string
     {
         $totalPages = $this->totalPages;
 
