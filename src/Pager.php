@@ -83,6 +83,8 @@ final class Pager
     {
         $attributes['argSep'] ??= ini_get('arg_separator.output') ?: '&';
 
+        $attributes = array_replace_recursive(self::$attributesDefault, $attributes);
+
         foreach ($attributes as $name => $value) {
             $this->setAttribute($name, $value);
         }
@@ -164,7 +166,7 @@ final class Pager
         $this->start = ($this->start > 1) ? ($this->start * $this->stop) - $this->stop : 0;
 
         $this->totalPages = 1;
-        if ($this->totalRecords > 0) {
+        if ($this->totalRecords > 1) {
             $this->totalPages = abs((int) ceil($this->totalRecords / $this->stop));
         }
 
