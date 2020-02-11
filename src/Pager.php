@@ -174,18 +174,18 @@ final class Pager
         if ($startValue !== null) {
             if ($startValue > $this->totalPages) {
                 $this->redirect($this->prepareQuery() . $this->startKey .'='. $this->totalPages, 307);
-            } elseif ($startValue && $startValue[0] == '-') {
+            } elseif ($startValue && strval($startValue)[0] == '-') {
                 $this->redirect($this->prepareQuery() . $this->startKey .'='. abs($startValue), 301);
-            } elseif ($startValue === '' || $startValue === '0' || !ctype_digit((string) $startValue)) {
+            } elseif ($startValue === '' || $startValue === '0' || !ctype_digit(strval($startValue))) {
                 $this->redirect(trim($this->prepareQuery(), $this->argSep), 301);
             }
         }
         if ($stopValue !== null) {
             if ($stopValue > $this->stopMax) {
                 $this->redirect($this->prepareQuery($this->stopKey) . $this->stopKey .'='. $this->stopMax, 307);
-            } elseif ($stopValue && $stopValue[0] == '-') {
+            } elseif ($stopValue && strval($stopValue)[0] == '-') {
                 $this->redirect($this->prepareQuery($this->stopKey) . $this->stopKey .'='. abs($stopValue), 301);
-            } elseif ($stopValue === '' || $stopValue === '0' || !ctype_digit((string) $stopValue)) {
+            } elseif ($stopValue === '' || $stopValue === '0' || !ctype_digit(strval($stopValue))) {
                 $this->redirect(trim($this->prepareQuery(), $this->argSep), 301);
             }
         }
