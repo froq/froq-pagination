@@ -437,9 +437,9 @@ final class Pager
         if (function_exists('redirect')) {
             redirect($to, $code);
         } elseif (!headers_sent()) {
-            $to = $this->escape($to);
-
             header('Location: '. $to, false, $code);
+
+            $to = $this->escape($to);
 
             // Yes..
             die('Redirecting to <a href="'. $to .'">'. $to .'</a>');
