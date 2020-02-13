@@ -437,7 +437,7 @@ final class Pager
         if (function_exists('redirect')) {
             redirect($to, $code);
         } elseif (!headers_sent()) {
-            header('Location: '. $to, false, $code);
+            header('Location: '. $to, true, $code);
 
             $to = $this->escape($to);
 
