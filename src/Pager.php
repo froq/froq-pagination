@@ -156,7 +156,7 @@ final class Pager
             $stopValue = $limit; // Skip GET parameter.
         }
 
-        // Get params could be manipulated by developer (setting autorun false).
+        // Get params may be manipulated by developer (setting autorun false).
         if ($this->autorun) {
             $this->start = abs($startValue);
             $this->stop = abs($stopValue);
