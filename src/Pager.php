@@ -407,7 +407,7 @@ final class Pager
         $query = trim($tmp[1] ?? '');
 
         if ($query != '') {
-            $query = Util::unparseQueryString(
+            $query = Util::buildQueryString(
                 Util::parseQueryString($query, true),
                 true,
                 join(',', [$this->startKey, $ignoredKeys])
@@ -454,6 +454,9 @@ final class Pager
      */
     private function escape(string $input): string
     {
+        if (function_exists('html_encode')) {
+            return html_encode($input);
+        }
         return str_replace(["'", '"', '<', '>'], ['&#39;', '&#34;', '&lt;', '&gt;'], $input);
     }
 }
