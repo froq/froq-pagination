@@ -97,8 +97,12 @@ final class Pager
      * @return void
      * @since  3.0
      */
-    public function __set(string $name, $value)
+    public function __set($name, $value)
     {
+        if (in_array($name, ['limit', 'offset'])) {
+            $name = ($name == 'limit') ? 'stop' : 'start';
+        }
+
         $this->setAttribute($name, $value);
     }
 
@@ -108,18 +112,13 @@ final class Pager
      * @return any|null
      * @since  3.0
      */
-    public function __get(string $name)
+    public function __get($name)
     {
-        return $this->getAttribute($name);
-    }
+        if (in_array($name, ['limit', 'offset'])) {
+            $name = ($name == 'limit') ? 'stop' : 'start';
+        }
 
-    /**
-     * Get offset (start alias).
-     * @return int
-     */
-    public function getOffset(): int
-    {
-        return $this->getAttribute('start');
+        return $this->getAttribute($name);
     }
 
     /**
@@ -129,6 +128,15 @@ final class Pager
     public function getLimit(): int
     {
         return $this->getAttribute('stop');
+    }
+
+    /**
+     * Get offset (start alias).
+     * @return int
+     */
+    public function getOffset(): int
+    {
+        return $this->getAttribute('start');
     }
 
     /**
