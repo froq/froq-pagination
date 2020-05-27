@@ -26,12 +26,14 @@ declare(strict_types=1);
 
 namespace froq\pager;
 
+use froq\common\Exception;
+
 /**
- * Pager exception.
+ * Pager Exception.
  * @package froq\pager
  * @object  froq\pager\PagerException
  * @author  Kerem Güneş <k-gun@mail.com>
  * @since   1.0
  */
-final class PagerException extends \Exception
+final class PagerException extends Exception
 {}
