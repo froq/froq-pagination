@@ -463,8 +463,10 @@ final class Pager
     private function escape(string $input): string
     {
         if (function_exists('html_encode')) {
-            return html_encode($input);
+            return str_replace("\0", '', html_encode($input));
         }
-        return str_replace(["'", '"', '<', '>'], ['&#39;', '&#34;', '&lt;', '&gt;'], $input);
+
+        return str_replace(["\0", "'", '"', '<', '>'],
+                           ['', '&#39;', '&#34;', '&lt;', '&gt;'], $input);
     }
 }
