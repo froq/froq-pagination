@@ -417,7 +417,7 @@ final class Pager
         if ($query != '') {
             $query = Util::buildQueryString(
                 Util::parseQueryString($query, true),
-                false,
+                true,
                 join(',', [$this->startKey, $ignoredKeys])
             );
 
