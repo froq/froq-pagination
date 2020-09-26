@@ -26,6 +26,7 @@ declare(strict_types=1);
 
 namespace froq\pager;
 
+use froq\common\interfaces\Arrayable;
 use froq\common\traits\AttributeTrait;
 use froq\util\Util;
 use froq\pager\PagerException;
@@ -37,7 +38,7 @@ use froq\pager\PagerException;
  * @author  Kerem Güneş <k-gun@mail.com>
  * @since   1.0
  */
-final class Pager
+final class Pager implements Arrayable
 {
     /**
      * Attribute trait.
@@ -71,6 +72,7 @@ final class Pager
         'linksClassName'    => 'pager',
         'numerateFirstLast' => false,
         'autorun'           => true,
+        'redirect'          => true,
         'argSep'            => '',
     ];
 
@@ -101,6 +103,7 @@ final class Pager
     {
         if (in_array($name, ['limit', 'offset'])) {
             $name = ($name == 'limit') ? 'stop' : 'start';
+            $value = (int) $value;
         }
 
         $this->setAttribute($name, $value);
@@ -137,6 +140,16 @@ final class Pager
     public function getOffset(): int
     {
         return $this->getAttribute('start');
+    }
+
+    /**
+     * Current.
+     * @return int
+     * @since  4.1
+     */
+    private function getCurrent(): int
+    {
+        return max(1, ($this->start / $this->stop) + 1);
     }
 
     /**
@@ -178,23 +191,23 @@ final class Pager
             $this->totalPages = abs((int) ceil($this->totalRecords / $this->stop));
         }
 
-        // Safety.
-        if ($startValue !== null) {
+        // Safety (if redirectable / redirect attribute is true).
+        if ($startValue !== null && $this->redirect) {
             if ($startValue > $this->totalPages) {
-                $this->redirect($this->prepareQuery() . $this->startKey .'='. $this->totalPages, 307);
+                $this->redirect($this->query() . $this->startKey .'='. $this->totalPages, 307);
             } elseif ($startValue && strval($startValue)[0] == '-') {
-                $this->redirect($this->prepareQuery() . $this->startKey .'='. abs($startValue), 301);
+                $this->redirect($this->query() . $this->startKey .'='. abs($startValue), 301);
             } elseif ($startValue === '' || $startValue === '0' || !ctype_digit(strval($startValue))) {
-                $this->redirect(trim($this->prepareQuery(), $this->argSep), 301);
+                $this->redirect(trim($this->query(), $this->argSep), 301);
             }
         }
-        if ($stopValue !== null) {
+        if ($stopValue !== null && $this->redirect) {
             if ($stopValue > $this->stopMax) {
-                $this->redirect($this->prepareQuery($this->stopKey) . $this->stopKey .'='. $this->stopMax, 307);
+                $this->redirect($this->query($this->stopKey) . $this->stopKey .'='. $this->stopMax, 307);
             } elseif ($stopValue && strval($stopValue)[0] == '-') {
-                $this->redirect($this->prepareQuery($this->stopKey) . $this->stopKey .'='. abs($stopValue), 301);
+                $this->redirect($this->query($this->stopKey) . $this->stopKey .'='. abs($stopValue), 301);
             } elseif ($stopValue === '' || $stopValue === '0' || !ctype_digit(strval($stopValue))) {
-                $this->redirect(trim($this->prepareQuery(), $this->argSep), 301);
+                $this->redirect(trim($this->query(), $this->argSep), 301);
             }
         }
 
@@ -246,8 +259,8 @@ final class Pager
         }
 
         $s = $this->startKey;
-        $query = $this->prepareQuery($ignoredKeys);
-        $start = max(1, ($this->start / $this->stop) + 1);
+        $query = $this->query($ignoredKeys);
+        $start = $this->getCurrent();
         $stop = $start + $linksLimit;
 
         // Calculate loop.
@@ -351,8 +364,8 @@ final class Pager
         $linksTemplate = $this->linksTemplate;
 
         $s = $this->startKey;
-        $query = $this->prepareQuery($ignoredKeys);
-        $start = max(1, ($this->start / $this->stop) + 1);
+        $query = $this->query($ignoredKeys);
+        $start = $this->getCurrent();
 
         // Add first & prev links.
         $prev = $start - 1;
@@ -404,11 +417,27 @@ final class Pager
     }
 
     /**
+     * Escape.
+     * @param  string $input
+     * @return string
+     * @since  4.0
+     */
+    private function escape(string $input): string
+    {
+        if (function_exists('html_encode')) {
+            return str_replace("\0", '', html_encode($input));
+        }
+
+        return str_replace(["\0", "'", '"', '<', '>'],
+                           ['', '&#39;', '&#34;', '&lt;', '&gt;'], $input);
+    }
+
+    /**
      * Prepare query.
      * @param  string|null $ignoredKeys
      * @return string
      */
-    private function prepareQuery(string $ignoredKeys = null): string
+    private function query(string $ignoredKeys = null): string
     {
         $tmp = explode('?', $_SERVER['REQUEST_URI'] ?? '', 2);
         $path = $tmp[0];
@@ -455,18 +484,22 @@ final class Pager
     }
 
     /**
-     * Escape.
-     * @param  string $input
-     * @return string
-     * @since  4.0
+     * @inheritDoc froq\common\interfaces\Arrayable
+     * @since 4.1
      */
-    private function escape(string $input): string
+    public function toArray(): array
     {
-        if (function_exists('html_encode')) {
-            return str_replace("\0", '', html_encode($input));
-        }
+        [$current, $totalPages, $totalRecords]
+            = [$this->getCurrent(), $this->totalPages, $this->totalRecords];
 
-        return str_replace(["\0", "'", '"', '<', '>'],
-                           ['', '&#39;', '&#34;', '&lt;', '&gt;'], $input);
+        return [
+            'limit'        => $this->getLimit(),
+            'offset'       => $this->getOffset(),
+            'current'      => $current,
+            'totalPages'   => $totalPages,
+            'totalRecords' => $totalRecords,
+            'hasPrev'      => ($current - 1) > 0,
+            'hasNext'      => ($current + 1) < $totalPages,
+        ];
     }
 }
