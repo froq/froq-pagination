@@ -213,7 +213,7 @@ final class Pager implements Arrayable
 
         // Fix start/stop.
         if ($this->totalRecords == 1) {
-            $this->stop = $this->stopDefault;
+            $this->stop = 1;
             $this->start = 0;
         }
 
