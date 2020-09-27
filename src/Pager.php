@@ -487,16 +487,20 @@ final class Pager implements Arrayable
      * @inheritDoc froq\common\interfaces\Arrayable
      * @since 4.1
      */
-    public function toArray(): array
+    public function toArray(bool $noEmpty = true): array
     {
         [$current, $totalPages, $totalRecords]
             = [$this->getCurrent(), $this->totalPages, $this->totalRecords];
+
+        if ($noEmpty && !$totalRecords) {
+            $current = 0;
+        }
 
         return [
             'limit'        => $this->getLimit(),
             'offset'       => $this->getOffset(),
             'current'      => $current,
-            'totalPages'   => $totalPages,
+            'totalPages'   => $current ? $totalPages : ($totalRecords ? $totalPages : 0),
             'totalRecords' => $totalRecords,
             'hasPrev'      => ($current - 1) > 0,
             'hasNext'      => ($current + 1) < $totalPages,
