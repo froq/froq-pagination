@@ -503,7 +503,7 @@ final class Pager implements Arrayable
             'totalPages'   => $current ? $totalPages : ($totalRecords ? $totalPages : 0),
             'totalRecords' => $totalRecords,
             'hasPrev'      => ($current - 1) > 0,
-            'hasNext'      => ($current + 1) < $totalPages,
+            'hasNext'      => ($current < $totalPages) && $current,
         ];
     }
 }
