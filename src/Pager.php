@@ -400,18 +400,18 @@ final class Pager implements Arrayable
 
     /**
      * Escape.
-     * @param  string $input
+     * @param  string $in
      * @return string
      * @since  4.0
      */
-    private function escape(string $input): string
+    private function escape(string $in): string
     {
         if (function_exists('html_encode')) {
-            return str_replace("\0", '', html_encode($input));
+            return str_replace("\0", '', html_encode($in));
         }
 
         return str_replace(["\0", "'", '"', '<', '>'],
-                           ['', '&#39;', '&#34;', '&lt;', '&gt;'], $input);
+                           ['', '&#39;', '&#34;', '&lt;', '&gt;'], $in);
     }
 
     /**
