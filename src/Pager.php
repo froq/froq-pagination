@@ -136,19 +136,19 @@ final class Pager implements Arrayable
 
     /**
      * Run.
-     * @param  int|null    $totalRecords
+     * @param  int|null    $count
      * @param  int|null    $limit
      * @param  string|null $startKey
      * @param  string|null $stopKey
      * @return array<int>
      */
-    public function run(int $totalRecords = null, int $limit = null, string $startKey = null,
-        string $stopKey = null): array
+    public function run(int $count = null, int $limit = null, string $startKey = null, string $stopKey = null): array
     {
-        if ($totalRecords !== null) {
-            $this->totalRecords = abs($totalRecords);
+        if ($count !== null) {
+            $this->totalRecords = abs($count);
         }
 
+        // Update start/stop keys.
         $startKey && $this->startKey = $startKey;
         $stopKey && $this->stopKey = $stopKey;
 
