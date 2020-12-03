@@ -161,8 +161,8 @@ final class Pager implements Arrayable
 
         // Get params may be manipulated by developer (setting autorun false).
         if ($this->autorun) {
-            $this->start = abs($startValue);
-            $this->stop = abs($stopValue);
+            $this->start = abs((int) $startValue);
+            $this->stop = abs((int) $stopValue);
         }
 
         $this->stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
