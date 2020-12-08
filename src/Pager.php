@@ -24,16 +24,12 @@ final class Pager implements Arrayable
 {
     /**
      * Attribute trait.
-     *
      * @see froq\common\traits\AttributeTrait
      * @since 4.0
      */
     use AttributeTrait;
 
-    /**
-     * Attributes default.
-     * @var array
-     */
+    /** @var array */
     private static array $attributesDefault = [
         'start'             => 0,
         'stop'              => 10, // Limit or per-page.
@@ -55,9 +51,8 @@ final class Pager implements Arrayable
         'numerateFirstLast' => false,
         'autorun'           => true,
         'redirect'          => true,
-        'argSep'            => '',
+        'argSep'            => '&',
     ];
-
 
     /**
      * Constructor.
@@ -65,13 +60,7 @@ final class Pager implements Arrayable
      */
     public function __construct(array $attributes = null)
     {
-        $attributes['argSep'] ??= ini_get('arg_separator.output') ?: '&';
-
-        $attributes = array_replace_recursive(self::$attributesDefault, $attributes);
-
-        foreach ($attributes as $name => $value) {
-            $this->setAttribute($name, $value);
-        }
+        $this->setAttributes($attributes, self::$attributesDefault);
     }
 
     /**
@@ -81,7 +70,7 @@ final class Pager implements Arrayable
      * @return void
      * @since  3.0
      */
-    public function __set($name, $value)
+    public function __set(string $name, $value)
     {
         if (in_array($name, ['limit', 'offset'])) {
             $name = ($name == 'limit') ? 'stop' : 'start';
@@ -97,7 +86,7 @@ final class Pager implements Arrayable
      * @return any|null
      * @since  3.0
      */
-    public function __get($name)
+    public function __get(string $name)
     {
         if (in_array($name, ['limit', 'offset'])) {
             $name = ($name == 'limit') ? 'stop' : 'start';
@@ -129,7 +118,7 @@ final class Pager implements Arrayable
      * @return int
      * @since  4.1
      */
-    private function getCurrent(): int
+    public function getCurrent(): int
     {
         return max(1, ($this->start / $this->stop) + 1);
     }
