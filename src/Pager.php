@@ -9,7 +9,7 @@ namespace froq\pager;
 
 use froq\pager\PagerException;
 use froq\common\interfaces\Arrayable;
-use froq\common\traits\AttributeTrait;
+use froq\common\trait\AttributeTrait;
 use froq\util\Util;
 
 /**
@@ -23,8 +23,7 @@ use froq\util\Util;
 final class Pager implements Arrayable
 {
     /**
-     * Attribute trait.
-     * @see froq\common\traits\AttributeTrait
+     * @see froq\common\trait\AttributeTrait
      * @since 4.0
      */
     use AttributeTrait;
