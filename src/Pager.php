@@ -8,8 +8,7 @@ declare(strict_types=1);
 namespace froq\pager;
 
 use froq\pager\PagerException;
-use froq\common\interfaces\Arrayable;
-use froq\common\trait\AttributeTrait;
+use froq\common\{interface\Arrayable, trait\AttributeTrait};
 use froq\util\Util;
 
 /**
@@ -454,7 +453,7 @@ final class Pager implements Arrayable
     }
 
     /**
-     * @inheritDoc froq\common\interfaces\Arrayable
+     * @inheritDoc froq\common\interface\Arrayable
      * @since 4.1
      */
     public function toArray(bool $noEmpty = true): array
