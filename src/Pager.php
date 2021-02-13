@@ -480,10 +480,10 @@ final class Pager implements Arrayable, Countable, JsonSerializable
             'limit'        => $this->getLimit(),
             'offset'       => $this->getOffset(),
             'current'      => $current,
+            'prev'         => ($current - 1 >= 1) ? $current - 1 : null,
+            'next'         => ($current + 1 <= $totalPages) ? $current + 1 : null,
             'totalPages'   => $totalPages,
             'totalRecords' => $totalRecords,
-            'hasPrev'      => ($current - 1) > 0,
-            'hasNext'      => ($current < $totalPages) && $current,
         ];
     }
 
