@@ -10,6 +10,7 @@ namespace froq\pager;
 use froq\pager\PagerException;
 use froq\common\{interface\Arrayable, trait\AttributeTrait};
 use froq\util\Util;
+use Countable, JsonSerializable;
 
 /**
  * Pager.
@@ -19,7 +20,7 @@ use froq\util\Util;
  * @author  Kerem Güneş
  * @since   1.0
  */
-final class Pager implements Arrayable
+final class Pager implements Arrayable, Countable, JsonSerializable
 {
     /**
      * @see froq\common\trait\AttributeTrait
@@ -484,5 +485,23 @@ final class Pager implements Arrayable
             'hasPrev'      => ($current - 1) > 0,
             'hasNext'      => ($current < $totalPages) && $current,
         ];
+    }
+
+    /**
+     * @inheritDoc Countable
+     * @since      5.0
+     */
+    public function count(): int
+    {
+        return $this->toArray()['totalPages'];
+    }
+
+    /**
+     * @inheritDoc JsonSerializable
+     * @since      5.0
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 }
