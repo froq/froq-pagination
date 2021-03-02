@@ -147,9 +147,10 @@ final class Pager implements Arrayable, Countable, JsonSerializable
         $startKey && $this->startKey = $startKey;
         $stopKey  && $this->stopKey = $stopKey;
 
-        $startValue = $_GET[$this->startKey] ?? null;
+        // Those may given in constructor.
+        $startValue = $_GET[$this->startKey] ?? $this->start;
         if ($limit === null) {
-            $stopValue = $_GET[$this->stopKey] ?? null;
+            $stopValue = $_GET[$this->stopKey] ?? $this->stop;
         } else {
             $stopValue = $limit; // Skip GET parameter.
         }
@@ -174,7 +175,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
                 $this->redirect($this->query() . $this->startKey .'='. $this->totalPages, 307);
             } elseif ($startValue && strval($startValue)[0] == '-') {
                 $this->redirect($this->query() . $this->startKey .'='. abs($startValue), 301);
-            } elseif ($startValue === '' || $startValue === '0' || !ctype_digit(strval($startValue))) {
+            } elseif ($startValue === '' || $startValue === '0' || !ctype_digit((string) $startValue)) {
                 $this->redirect(trim($this->query(), $this->argSep), 301);
             }
         }
@@ -183,7 +184,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
                 $this->redirect($this->query($this->stopKey) . $this->stopKey .'='. $this->stopMax, 307);
             } elseif ($stopValue && strval($stopValue)[0] == '-') {
                 $this->redirect($this->query($this->stopKey) . $this->stopKey .'='. abs($stopValue), 301);
-            } elseif ($stopValue === '' || $stopValue === '0' || !ctype_digit(strval($stopValue))) {
+            } elseif ($stopValue === '' || $stopValue === '0' || !ctype_digit((string) $stopValue)) {
                 $this->redirect(trim($this->query(), $this->argSep), 301);
             }
         }
