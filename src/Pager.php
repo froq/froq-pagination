@@ -30,8 +30,8 @@ final class Pager implements Arrayable, Countable, JsonSerializable
 
     /** @var array */
     private static array $attributesDefault = [
-        'start'             => 0,
-        'stop'              => 10, // Limit or per-page.
+        'start'             => 0,    // Offset.
+        'stop'              => 10,   // Limit or per-page.
         'stopMax'           => 1000,
         'stopDefault'       => 10,
         'startKey'          => 's',  // GET param key of start.
@@ -493,7 +493,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
      */
     public function count(): int
     {
-        return $this->toArray()['totalPages'];
+        return $this->totalRecords ? $this->totalPages : 0;
     }
 
     /**
