@@ -1,60 +1,37 @@
 <?php
 /**
- * MIT License <https://opensource.org/licenses/mit>
- *
- * Copyright (c) 2015 Kerem Güneş
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is furnished
- * to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * Copyright (c) 2015 · Kerem Güneş
+ * Apache License 2.0 · http://github.com/froq/froq-pager
  */
 declare(strict_types=1);
 
 namespace froq\pager;
 
-use froq\common\interfaces\Arrayable;
-use froq\common\traits\AttributeTrait;
-use froq\util\Util;
 use froq\pager\PagerException;
+use froq\common\{interface\Arrayable, trait\AttributeTrait};
+use froq\util\Util;
+use Countable, JsonSerializable;
 
 /**
  * Pager.
+ *
  * @package froq\pager
  * @object  froq\pager\Pager
- * @author  Kerem Güneş <k-gun@mail.com>
+ * @author  Kerem Güneş
  * @since   1.0
  */
-final class Pager implements Arrayable
+final class Pager implements Arrayable, Countable, JsonSerializable
 {
     /**
-     * Attribute trait.
-     *
-     * @see froq\common\traits\AttributeTrait
+     * @see froq\common\trait\AttributeTrait
      * @since 4.0
      */
     use AttributeTrait;
 
-    /**
-     * Attributes default.
-     * @var array
-     */
+    /** @var array */
     private static array $attributesDefault = [
-        'start'             => 0,
-        'stop'              => 10, // Limit or per-page.
+        'start'             => 0,    // Offset.
+        'stop'              => 10,   // Limit or per-page.
         'stopMax'           => 1000,
         'stopDefault'       => 10,
         'startKey'          => 's',  // GET param key of start.
@@ -73,33 +50,28 @@ final class Pager implements Arrayable
         'numerateFirstLast' => false,
         'autorun'           => true,
         'redirect'          => true,
-        'argSep'            => '',
+        'argSep'            => '&',
     ];
-
 
     /**
      * Constructor.
+     *
      * @param array|null $attributes
      */
     public function __construct(array $attributes = null)
     {
-        $attributes['argSep'] ??= ini_get('arg_separator.output') ?: '&';
-
-        $attributes = array_replace_recursive(self::$attributesDefault, $attributes);
-
-        foreach ($attributes as $name => $value) {
-            $this->setAttribute($name, $value);
-        }
+        $this->setAttributes($attributes, self::$attributesDefault);
     }
 
     /**
-     * Set.
+     * Magic - set.
+     *
      * @param  string $name
      * @param  any    $value
      * @return void
      * @since  3.0
      */
-    public function __set($name, $value)
+    public function __set(string $name, $value)
     {
         if (in_array($name, ['limit', 'offset'])) {
             $name = ($name == 'limit') ? 'stop' : 'start';
@@ -110,12 +82,13 @@ final class Pager implements Arrayable
     }
 
     /**
-     * Get.
+     * Magic - get.
+     *
      * @param  string $name
      * @return any|null
      * @since  3.0
      */
-    public function __get($name)
+    public function __get(string $name)
     {
         if (in_array($name, ['limit', 'offset'])) {
             $name = ($name == 'limit') ? 'stop' : 'start';
@@ -126,6 +99,7 @@ final class Pager implements Arrayable
 
     /**
      * Get limit (stop alias).
+     *
      * @return int
      */
     public function getLimit(): int
@@ -135,6 +109,7 @@ final class Pager implements Arrayable
 
     /**
      * Get offset (start alias).
+     *
      * @return int
      */
     public function getOffset(): int
@@ -144,46 +119,49 @@ final class Pager implements Arrayable
 
     /**
      * Current.
+     *
      * @return int
      * @since  4.1
      */
-    private function getCurrent(): int
+    public function getCurrent(): int
     {
         return max(1, ($this->start / $this->stop) + 1);
     }
 
     /**
      * Run.
-     * @param  int|null    $totalRecords
+     *
+     * @param  int|null    $count
      * @param  int|null    $limit
      * @param  string|null $startKey
      * @param  string|null $stopKey
      * @return array<int>
      */
-    public function run(int $totalRecords = null, int $limit = null, string $startKey = null,
-        string $stopKey = null): array
+    public function run(int $count = null, int $limit = null, string $startKey = null, string $stopKey = null): array
     {
-        if ($totalRecords !== null) {
-            $this->totalRecords = abs($totalRecords);
+        if ($count !== null) {
+            $this->totalRecords = abs($count);
         }
 
+        // Update start/stop keys.
         $startKey && $this->startKey = $startKey;
-        $stopKey && $this->stopKey = $stopKey;
+        $stopKey  && $this->stopKey = $stopKey;
 
-        $startValue = $_GET[$this->startKey] ?? null;
+        // Those may given in constructor.
+        $startValue = $_GET[$this->startKey] ?? $this->start;
         if ($limit === null) {
-            $stopValue = $_GET[$this->stopKey] ?? null;
+            $stopValue = $_GET[$this->stopKey] ?? $this->stop;
         } else {
             $stopValue = $limit; // Skip GET parameter.
         }
 
         // Get params may be manipulated by developer (setting autorun false).
         if ($this->autorun) {
-            $this->start = abs($startValue);
-            $this->stop = abs($stopValue);
+            $this->start = abs((int) $startValue);
+            $this->stop  = abs((int) $stopValue);
         }
 
-        $this->stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
+        $this->stop  = ($this->stop > 0) ? $this->stop : $this->stopDefault;
         $this->start = ($this->start > 1) ? ($this->start * $this->stop) - $this->stop : 0;
 
         $this->totalPages = 1;
@@ -197,7 +175,7 @@ final class Pager implements Arrayable
                 $this->redirect($this->query() . $this->startKey .'='. $this->totalPages, 307);
             } elseif ($startValue && strval($startValue)[0] == '-') {
                 $this->redirect($this->query() . $this->startKey .'='. abs($startValue), 301);
-            } elseif ($startValue === '' || $startValue === '0' || !ctype_digit(strval($startValue))) {
+            } elseif ($startValue === '' || $startValue === '0' || !ctype_digit((string) $startValue)) {
                 $this->redirect(trim($this->query(), $this->argSep), 301);
             }
         }
@@ -206,14 +184,14 @@ final class Pager implements Arrayable
                 $this->redirect($this->query($this->stopKey) . $this->stopKey .'='. $this->stopMax, 307);
             } elseif ($stopValue && strval($stopValue)[0] == '-') {
                 $this->redirect($this->query($this->stopKey) . $this->stopKey .'='. abs($stopValue), 301);
-            } elseif ($stopValue === '' || $stopValue === '0' || !ctype_digit(strval($stopValue))) {
+            } elseif ($stopValue === '' || $stopValue === '0' || !ctype_digit((string) $stopValue)) {
                 $this->redirect(trim($this->query(), $this->argSep), 301);
             }
         }
 
         // Fix start/stop.
         if ($this->totalRecords == 1) {
-            $this->stop = 1;
+            $this->stop  = 1;
             $this->start = 0;
         }
 
@@ -222,6 +200,7 @@ final class Pager implements Arrayable
 
     /**
      * Generate links.
+     *
      * @param  int|null    $linksLimit
      * @param  string|null $ignoredKeys
      * @param  string|null $linksClassName
@@ -247,10 +226,9 @@ final class Pager implements Arrayable
         }
 
         $linksTemplate = $this->linksTemplate;
-        $numerateFirstLast = $this->numerateFirstLast;
-        if ($numerateFirstLast) {
+        if ($this->numerateFirstLast) {
             $linksTemplate['first'] = 1;
-            $linksTemplate['last'] = $totalPages;
+            $linksTemplate['last']  = $totalPages;
         }
 
         $linksLimit = $linksLimit ?? $this->linksLimit;
@@ -258,21 +236,22 @@ final class Pager implements Arrayable
             $linksLimit = $totalPages;
         }
 
-        $s = $this->startKey;
-        $query = $this->query($ignoredKeys);
-        $start = $this->getCurrent();
-        $stop = $start + $linksLimit;
+        $s      = $this->startKey;
+        $query  = $this->query($ignoredKeys);
+        $start  = $this->getCurrent();
+        $stop   = $start + $linksLimit;
+
+        $sub    = 1;
+        $mid    = ceil($linksLimit / 2);
+        $midsub = $mid - $sub;
 
         // Calculate loop.
-        $sub = 1;
-        $middle = ceil($linksLimit / 2);
-        $middleSub = $middle - $sub;
-        if ($start >= $middle) {
-            $i = $start - $middleSub;
-            $loop = $stop - $middleSub;
+        if ($start >= $mid) {
+            $i    = $start - $midsub;
+            $loop = $stop  - $midsub;
         } else {
-            $i = $sub;
-            $loop = ($start == $middleSub) ? $stop - $sub : $stop;
+            $i    = $sub;
+            $loop = ($start == $midsub) ? $stop - $sub : $stop;
             if ($loop >= $linksLimit) {
                 $diff = $loop - $linksLimit;
                 $loop = $loop - $diff + $sub;
@@ -337,6 +316,7 @@ final class Pager implements Arrayable
 
     /**
      * Generate links center.
+     *
      * @param  string|null $page
      * @param  string|null $ignoredKeys
      * @param  string      $linksClassName
@@ -363,7 +343,7 @@ final class Pager implements Arrayable
 
         $linksTemplate = $this->linksTemplate;
 
-        $s = $this->startKey;
+        $s     = $this->startKey;
         $query = $this->query($ignoredKeys);
         $start = $this->getCurrent();
 
@@ -394,7 +374,8 @@ final class Pager implements Arrayable
     }
 
     /**
-     * Template.
+     * Make a template with given links.
+     *
      * @param  array       $links
      * @param  string|null $linksClassName
      * @param  bool        $center
@@ -417,31 +398,29 @@ final class Pager implements Arrayable
     }
 
     /**
-     * Escape.
-     * @param  string $input
+     * Escape input.
+     *
+     * @param  string $in
      * @return string
      * @since  4.0
      */
-    private function escape(string $input): string
+    private function escape(string $in): string
     {
-        if (function_exists('html_encode')) {
-            return str_replace("\0", '', html_encode($input));
-        }
-
         return str_replace(["\0", "'", '"', '<', '>'],
-                           ['', '&#39;', '&#34;', '&lt;', '&gt;'], $input);
+                           ['', '&#39;', '&#34;', '&lt;', '&gt;'], $in);
     }
 
     /**
      * Prepare query.
+     *
      * @param  string|null $ignoredKeys
      * @return string
      */
     private function query(string $ignoredKeys = null): string
     {
-        $tmp = explode('?', $_SERVER['REQUEST_URI'] ?? '', 2);
-        $path = $tmp[0];
-        $query = trim($tmp[1] ?? '');
+        $temp  = explode('?', ($_SERVER['REQUEST_URI'] ?? ''), 2);
+        $path  = $temp[0];
+        $query = trim($temp[1] ?? '');
 
         if ($query != '') {
             $query = Util::buildQueryString(
@@ -462,6 +441,7 @@ final class Pager implements Arrayable
 
     /**
      * Redirect.
+     *
      * @param  string $to
      * @param  int    $code
      * @return void
@@ -484,26 +464,45 @@ final class Pager implements Arrayable
     }
 
     /**
-     * @inheritDoc froq\common\interfaces\Arrayable
-     * @since 4.1
+     * @inheritDoc froq\common\interface\Arrayable
+     * @since      4.1
      */
     public function toArray(bool $noEmpty = true): array
     {
-        [$current, $totalPages, $totalRecords]
-            = [$this->getCurrent(), $this->totalPages, $this->totalRecords];
+        [$current, $totalPages, $totalRecords] = [
+            $this->getCurrent(), $this->totalPages, $this->totalRecords
+        ];
 
         if ($noEmpty && !$totalRecords) {
-            $current = 0;
+            $totalPages = 0;
         }
 
         return [
             'limit'        => $this->getLimit(),
             'offset'       => $this->getOffset(),
             'current'      => $current,
-            'totalPages'   => $current ? $totalPages : ($totalRecords ? $totalPages : 0),
+            'prev'         => ($current - 1 >= 1) ? $current - 1 : null,
+            'next'         => ($current + 1 <= $totalPages) ? $current + 1 : null,
+            'totalPages'   => $totalPages,
             'totalRecords' => $totalRecords,
-            'hasPrev'      => ($current - 1) > 0,
-            'hasNext'      => ($current < $totalPages) && $current,
         ];
+    }
+
+    /**
+     * @inheritDoc Countable
+     * @since      5.0
+     */
+    public function count(): int
+    {
+        return $this->totalRecords ? $this->totalPages : 0;
+    }
+
+    /**
+     * @inheritDoc JsonSerializable
+     * @since      5.0
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 }
