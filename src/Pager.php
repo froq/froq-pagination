@@ -423,10 +423,11 @@ final class Pager implements Arrayable, Countable, JsonSerializable
         $query = trim($temp[1] ?? '');
 
         if ($query != '') {
+            $ignoredKeys = implode(',', [$this->startKey, $ignoredKeys]);
+
             $query = Util::buildQueryString(
                 Util::parseQueryString($query, true),
-                true,
-                join(',', [$this->startKey, $ignoredKeys])
+                decode: true, ignoredKeys: $ignoredKeys
             );
 
             if ($query != '') {
