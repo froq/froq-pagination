@@ -144,8 +144,8 @@ final class Pager implements Arrayable, Countable, JsonSerializable
         }
 
         // Update start/stop keys.
-        $startKey && $this->startKey = $startKey;
-        $stopKey  && $this->stopKey = $stopKey;
+        $startKey && ($this->startKey = $startKey);
+        $stopKey && ($this->stopKey = $stopKey);
 
         // Those may given in constructor.
         $startValue = $_GET[$this->startKey] ?? $this->start;
@@ -158,15 +158,16 @@ final class Pager implements Arrayable, Countable, JsonSerializable
         // Get params may be manipulated by developer (setting autorun false).
         if ($this->autorun) {
             $this->start = abs((int) $startValue);
-            $this->stop  = abs((int) $stopValue);
+            $this->stop = abs((int) $stopValue);
         }
 
-        $this->stop  = ($this->stop > 0) ? $this->stop : $this->stopDefault;
+        $this->stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
         $this->start = ($this->start > 1) ? ($this->start * $this->stop) - $this->stop : 0;
 
         $this->totalPages = 1;
         if ($this->totalRecords > 1) {
             $this->totalPages = abs((int) ceil($this->totalRecords / $this->stop));
+            // $this->totalPages = abs((int) ceil($this->totalRecords / 1.25)); // @nope
         }
 
         // Safety (if redirectable / redirect attribute is true).
@@ -191,8 +192,8 @@ final class Pager implements Arrayable, Countable, JsonSerializable
 
         // Fix start/stop.
         if ($this->totalRecords == 1) {
-            $this->stop  = 1;
             $this->start = 0;
+            $this->stop = 1;
         }
 
         return [$this->stop, $this->start];
