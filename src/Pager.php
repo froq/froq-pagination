@@ -147,10 +147,10 @@ final class Pager implements Arrayable, Countable, JsonSerializable
         $startKey && ($this->startKey = $startKey);
         $stopKey && ($this->stopKey = $stopKey);
 
-        // Those may given in constructor.
-        $startValue = $_GET[$this->startKey] ?? $this->start;
+        // These stuff may be given in constructor as well.
+        $startValue = self::getStartParam($startKey) ?? $this->start;
         if ($limit === null) {
-            $stopValue = $_GET[$this->stopKey] ?? $this->stop;
+            $stopValue = self::getStopParam($stopKey) ?? $this->stop;
         } else {
             $stopValue = $limit; // Skip GET parameter.
         }
@@ -372,6 +372,34 @@ final class Pager implements Arrayable, Countable, JsonSerializable
         $this->linksCenter = $links;
 
         return $this->template($links, $linksClassName, true);
+    }
+
+    /**
+     * Get start param from $_GET global.
+     *
+     * @param  string|null $key
+     * @return int|null
+     * @since  5.1
+     */
+    public static function getStartParam(string $key = null): int|null
+    {
+        $key ??= self::$attributesDefault['startKey'];
+
+        return isset($_GET[$key]) ? intval($_GET[$key]) : null;
+    }
+
+    /**
+     * Get stop param from $_GET global.
+     *
+     * @param  string|null $key
+     * @return int|null
+     * @since  5.1
+     */
+    public static function getStopParam(string $key = null): int|null
+    {
+        $key ??= self::$attributesDefault['stopKey'];
+
+        return isset($_GET[$key]) ? intval($_GET[$key]) : null;
     }
 
     /**
