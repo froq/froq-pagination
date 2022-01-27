@@ -455,7 +455,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
             $ignoredKeys = implode(',', [$this->startKey, $ignoredKeys]);
 
             $query = Util::buildQueryString(
-                Util::parseQueryString($query, true),
+                Util::parseQueryString($query, encode: true),
                 decode: true, ignoredKeys: $ignoredKeys
             );
 
