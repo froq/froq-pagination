@@ -448,15 +448,15 @@ final class Pager implements Arrayable, Countable, JsonSerializable
     private function query(string $ignoredKeys = null): string
     {
         $temp  = explode('?', ($_SERVER['REQUEST_URI'] ?? ''), 2);
-        $path  = $temp[0];
+        $path  = trim($temp[0]);
         $query = trim($temp[1] ?? '');
 
         if ($query != '') {
             $ignoredKeys = implode(',', [$this->startKey, $ignoredKeys]);
 
             $query = Util::buildQueryString(
-                Util::parseQueryString($query, encode: true),
-                decode: true, ignoredKeys: $ignoredKeys
+                Util::parseQueryString($query),
+                ignoredKeys: $ignoredKeys
             );
 
             if ($query != '') {
