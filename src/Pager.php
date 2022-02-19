@@ -9,7 +9,6 @@ namespace froq\pager;
 
 use froq\pager\PagerException;
 use froq\common\{interface\Arrayable, trait\AttributeTrait};
-use froq\util\Util;
 use Countable, JsonSerializable;
 
 /**
@@ -452,12 +451,17 @@ final class Pager implements Arrayable, Countable, JsonSerializable
         $query = trim($temp[1] ?? '');
 
         if ($query != '') {
-            $ignoredKeys = implode(',', [$this->startKey, $ignoredKeys]);
+            $query = http_query_parse($query);
 
-            $query = Util::buildQueryString(
-                Util::parseQueryString($query),
-                ignoredKeys: $ignoredKeys
-            );
+            $keys = $this->startKey;
+            if ($ignoredKeys != '') {
+                $keys .= ',' . $ignoredKeys;
+            }
+
+            // Drop ignored keys.
+            $query = array_unset($query, ...explode(',', $keys));
+
+            $query = http_query_build($query);
 
             if ($query != '') {
                 $query .= $this->argSep;
