@@ -451,7 +451,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
         $query = trim($temp[1] ?? '');
 
         if ($query != '') {
-            $query = http_query_parse($query);
+            $query = http_parse_query_string($query);
 
             $keys = $this->startKey;
             if ($ignoredKeys != '') {
@@ -461,7 +461,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
             // Drop ignored keys.
             $query = array_unset($query, ...explode(',', $keys));
 
-            $query = http_query_build($query);
+            $query = http_build_query_string($query);
 
             if ($query != '') {
                 $query .= $this->argSep;
