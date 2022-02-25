@@ -416,26 +416,29 @@ final class Pager implements Arrayable, Countable, JsonSerializable
             $linksClassName .= ' center';
         }
 
-        $tpl  = "<ul class=\"{$linksClassName}\">";
+        $ret = "<ul class=\"{$linksClassName}\">";
         foreach ($links as $link) {
-            $tpl .= "<li>{$link}</li>";
+            $ret .= "<li>{$link}</li>";
         }
-        $tpl .= "</ul>";
+        $ret .= "</ul>";
 
-        return $tpl;
+        return $ret;
     }
 
     /**
      * Escape input.
      *
-     * @param  string $in
+     * @param  string $input
      * @return string
      * @since  4.0
      */
-    private function escape(string $in): string
+    private function escape(string $input): string
     {
-        return str_replace(["\0", "'", '"', '<', '>'],
-                           ['', '&#39;', '&#34;', '&lt;', '&gt;'], $in);
+        return str_replace(
+            ["\0", "'", '"', '<', '>'],
+            ['', '&#39;', '&#34;', '&lt;', '&gt;'],
+            $input
+        );
     }
 
     /**
