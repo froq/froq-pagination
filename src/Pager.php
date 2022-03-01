@@ -19,10 +19,7 @@ use froq\common\{interface\Arrayable, trait\AttributeTrait};
  */
 final class Pager implements Arrayable, \Countable, \JsonSerializable
 {
-    /**
-     * @see froq\common\trait\AttributeTrait
-     * @since 4.0
-     */
+    /** @see froq\common\trait\AttributeTrait */
     use AttributeTrait;
 
     /** @var array */
@@ -500,7 +497,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
 
     /**
      * @inheritDoc froq\common\interface\Arrayable
-     * @since      4.1
+     * @since 4.1
      */
     public function toArray(bool $noEmpty = true): array
     {
@@ -525,7 +522,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
 
     /**
      * @inheritDoc Countable
-     * @since      5.0
+     * @since 5.0
      */
     public function count(): int
     {
@@ -534,7 +531,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
 
     /**
      * @inheritDoc JsonSerializable
-     * @since      5.0
+     * @since 5.0
      */
     public function jsonSerialize(): array
     {
