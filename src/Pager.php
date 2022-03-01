@@ -7,9 +7,7 @@ declare(strict_types=1);
 
 namespace froq\pager;
 
-use froq\pager\PagerException;
 use froq\common\{interface\Arrayable, trait\AttributeTrait};
-use Countable, JsonSerializable;
 
 /**
  * Pager.
@@ -19,7 +17,7 @@ use Countable, JsonSerializable;
  * @author  Kerem Güneş
  * @since   1.0
  */
-final class Pager implements Arrayable, Countable, JsonSerializable
+final class Pager implements Arrayable, \Countable, \JsonSerializable
 {
     /**
      * @see froq\common\trait\AttributeTrait
