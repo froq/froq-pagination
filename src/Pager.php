@@ -67,7 +67,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
      */
     public function __set(string $name, $value)
     {
-        if (in_array($name, ['limit', 'offset'])) {
+        if (in_array($name, ['limit', 'offset'], true)) {
             $name = ($name == 'limit') ? 'stop' : 'start';
             $value = (int) $value;
         }
@@ -84,7 +84,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
      */
     public function __get(string $name)
     {
-        if (in_array($name, ['limit', 'offset'])) {
+        if (in_array($name, ['limit', 'offset'], true)) {
             $name = ($name == 'limit') ? 'stop' : 'start';
         }
 
