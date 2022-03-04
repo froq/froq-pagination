@@ -58,14 +58,10 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
     }
 
     /**
-     * Magic - set.
-     *
-     * @param  string $name
-     * @param  any    $value
-     * @return void
-     * @since  3.0
+     * @magic
+     * @since 3.0
      */
-    public function __set(string $name, $value)
+    public function __set(string $name, mixed $value): void
     {
         if (in_array($name, ['limit', 'offset'], true)) {
             $name = ($name == 'limit') ? 'stop' : 'start';
@@ -76,13 +72,10 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
     }
 
     /**
-     * Magic - get.
-     *
-     * @param  string $name
-     * @return any|null
-     * @since  3.0
+     * @magic
+     * @since 3.0
      */
-    public function __get(string $name)
+    public function __get(string $name): mixed
     {
         if (in_array($name, ['limit', 'offset'], true)) {
             $name = ($name == 'limit') ? 'stop' : 'start';
