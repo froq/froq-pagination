@@ -209,7 +209,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
         }
 
         $links = (array) $this->links;
-        if ($links != null) {
+        if ($links) {
             return $this->template($links, $linksClassName);
         }
 
@@ -325,7 +325,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
         }
 
         $links = (array) $this->linksCenter;
-        if ($links != null) {
+        if ($links) {
             return $this->template($links, $linksClassName, true);
         }
 
