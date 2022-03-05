@@ -19,7 +19,6 @@ use froq\common\{interface\Arrayable, trait\AttributeTrait};
  */
 final class Pager implements Arrayable, \Countable, \JsonSerializable
 {
-    /** @see froq\common\trait\AttributeTrait */
     use AttributeTrait;
 
     /** @var array */
