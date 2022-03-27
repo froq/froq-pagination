@@ -53,6 +53,12 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
      */
     public function __construct(array $attributes = null)
     {
+        // @todo: Change that stop/start stuff => limit/offset or page?
+        if ($attributes) {
+            $attributes = array_swap($attributes, 'page', 'start');
+            $attributes = array_swap($attributes, 'limit', 'stop');
+        }
+
         $this->setAttributes($attributes, self::$attributesDefault);
     }
 
@@ -63,7 +69,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
     public function __set(string $name, mixed $value): void
     {
         if (in_array($name, ['limit', 'offset'], true)) {
-            $name = ($name == 'limit') ? 'stop' : 'start';
+            $name  = ($name == 'limit') ? 'stop' : 'start';
             $value = (int) $value;
         }
 
@@ -78,6 +84,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
     {
         if (in_array($name, ['limit', 'offset'], true)) {
             $name = ($name == 'limit') ? 'stop' : 'start';
+            return (int) $this->getAttribute($name);
         }
 
         return $this->getAttribute($name);
@@ -90,7 +97,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
      */
     public function getLimit(): int
     {
-        return $this->getAttribute('stop');
+        return (int) $this->getAttribute('stop');
     }
 
     /**
@@ -100,7 +107,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
      */
     public function getOffset(): int
     {
-        return $this->getAttribute('start');
+        return (int) $this->getAttribute('start');
     }
 
     /**
@@ -111,7 +118,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
      */
     public function getCurrent(): int
     {
-        return max(1, ~~($this->start / $this->stop) + 1);
+        return max(1, intval($this->start / $this->stop) + 1);
     }
 
     /**
