@@ -7,7 +7,8 @@ declare(strict_types=1);
 
 namespace froq\pager;
 
-use froq\common\{interface\Arrayable, trait\AttributeTrait};
+use froq\common\interface\{Arrayable, Objectable};
+use froq\common\trait\AttributeTrait;
 
 /**
  * Pager.
@@ -17,14 +18,14 @@ use froq\common\{interface\Arrayable, trait\AttributeTrait};
  * @author  Kerem Güneş
  * @since   1.0
  */
-final class Pager implements Arrayable, \Countable, \JsonSerializable
+final class Pager implements Arrayable, Objectable, \JsonSerializable
 {
     use AttributeTrait;
 
     /** @var array */
     private static array $attributesDefault = [
         'start'             => 0,    // Offset.
-        'stop'              => 10,   // Limit or per-page.
+        'stop'              => 10,   // Limit (per-page).
         'stopMax'           => 1000,
         'stopDefault'       => 10,
         'startKey'          => 's',  // GET param key of start.
@@ -164,7 +165,7 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
             // $this->totalPages = abs((int) ceil($this->totalRecords / 1.25)); // @nope
         }
 
-        // Safety (if redirectable / redirect attribute is true).
+        // Safety (if "redirect" attribute is true).
         if ($startValue !== null && $this->redirect) {
             if ($startValue > $this->totalPages) {
                 $this->redirect($this->query() . $this->startKey .'='. $this->totalPages, 307);
@@ -398,11 +399,6 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
 
     /**
      * Make a template with given links.
-     *
-     * @param  array       $links
-     * @param  string|null $linksClassName
-     * @param  bool        $center
-     * @return string
      */
     private function template(array $links, string $linksClassName = null, bool $center = false): string
     {
@@ -422,10 +418,6 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
 
     /**
      * Escape input.
-     *
-     * @param  string $input
-     * @return string
-     * @since  4.0
      */
     private function escape(string $input): string
     {
@@ -438,9 +430,6 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
 
     /**
      * Prepare query.
-     *
-     * @param  string|null $ignoredKeys
-     * @return string
      */
     private function query(string $ignoredKeys = null): string
     {
@@ -473,10 +462,6 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
 
     /**
      * Redirect.
-     *
-     * @param  string $to
-     * @param  int    $code
-     * @return void
      */
     private function redirect(string $to, int $code): void
     {
@@ -497,7 +482,6 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
 
     /**
      * @inheritDoc froq\common\interface\Arrayable
-     * @since 4.1
      */
     public function toArray(bool $noEmpty = true): array
     {
@@ -521,12 +505,11 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
     }
 
     /**
-     * @inheritDoc Countable
-     * @since 5.0
+     * @inheritDoc froq\common\interface\Objectable
      */
-    public function count(): int
+    public function toObject(bool $noEmpty = true): object
     {
-        return $this->totalRecords ? $this->totalPages : 0;
+        return (object) $this->toArray($noEmpty);
     }
 
     /**
