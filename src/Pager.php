@@ -55,8 +55,9 @@ final class Pager implements Arrayable, \Countable, \JsonSerializable
     {
         // @todo: Change that stop/start stuff => limit/offset or page?
         if ($attributes) {
-            $attributes = array_swap($attributes, 'page', 'start');
-            $attributes = array_swap($attributes, 'limit', 'stop');
+            isset($attributes['page'])  && array_swap($attributes, 'page', 'start');
+            isset($attributes['limit']) && array_swap($attributes, 'limit', 'stop');
+            isset($attributes['count']) && array_swap($attributes, 'count', 'totalRecords');
         }
 
         $this->setAttributes($attributes, self::$attributesDefault);
