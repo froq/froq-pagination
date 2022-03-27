@@ -120,7 +120,7 @@ final class Pager implements Arrayable, Objectable, \JsonSerializable
      */
     public function getCurrent(): int
     {
-        return max(1, intval($this->start / $this->stop) + 1);
+        return max(1, (int) fdiv($this->start, $this->stop) + 1);
     }
 
     /**
