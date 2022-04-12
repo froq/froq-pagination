@@ -11,7 +11,7 @@ use froq\common\interface\{Arrayable, Objectable};
 use froq\common\trait\AttributeTrait;
 
 /**
- * Pager.
+ * A class for paginations and page link generations.
  *
  * @package froq\pager
  * @object  froq\pager\Pager
