@@ -130,9 +130,9 @@ final class Pager implements Arrayable, Objectable, \JsonSerializable
      * @param  int|null    $limit
      * @param  string|null $startKey
      * @param  string|null $stopKey
-     * @return array<int>
+     * @return self
      */
-    public function run(int $count = null, int $limit = null, string $startKey = null, string $stopKey = null): array
+    public function run(int $count = null, int $limit = null, string $startKey = null, string $stopKey = null): self
     {
         if ($count !== null) {
             $this->totalRecords = abs($count);
@@ -191,7 +191,7 @@ final class Pager implements Arrayable, Objectable, \JsonSerializable
             $this->stop = 1;
         }
 
-        return [$this->stop, $this->start];
+        return $this;
     }
 
     /**
