@@ -43,7 +43,7 @@ final class Pager implements Arrayable, Objectable, \JsonSerializable
         'linksClassName'    => 'pager',
         'numerateFirstLast' => false,
         'autorun'           => true,
-        'redirect'          => true,
+        'redirect'          => false,
         'argSep'            => '&',
     ];
 
