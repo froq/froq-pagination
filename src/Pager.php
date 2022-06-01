@@ -65,8 +65,8 @@ final class Pager implements Arrayable, Objectable, \JsonSerializable
     }
 
     /**
-     * @magic
      * @since 3.0
+     * @magic
      */
     public function __set(string $name, mixed $value): void
     {
@@ -79,8 +79,8 @@ final class Pager implements Arrayable, Objectable, \JsonSerializable
     }
 
     /**
-     * @magic
      * @since 3.0
+     * @magic
      */
     public function __get(string $name): mixed
     {
