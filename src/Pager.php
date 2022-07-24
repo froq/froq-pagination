@@ -485,9 +485,8 @@ final class Pager implements Arrayable, Objectable, \JsonSerializable
      */
     public function toArray(bool $noEmpty = true): array
     {
-        [$current, $totalPages, $totalRecords] = [
-            $this->getCurrent(), $this->totalPages, $this->totalRecords
-        ];
+        [$current, $totalPages, $totalRecords]
+            = [$this->getCurrent(), $this->totalPages, $this->totalRecords];
 
         if ($noEmpty && !$totalRecords) {
             $totalPages = 0;
