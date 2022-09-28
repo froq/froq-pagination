@@ -7,31 +7,25 @@ declare(strict_types=1);
 
 namespace froq\pager;
 
-use froq\pager\PagerException;
-use froq\common\{interface\Arrayable, trait\AttributeTrait};
-use froq\util\Util;
-use Countable, JsonSerializable;
+use froq\common\interface\{Arrayable, Objectable};
+use froq\common\trait\AttributeTrait;
 
 /**
- * Pager.
+ * A class for paginations and page link generations.
  *
  * @package froq\pager
  * @object  froq\pager\Pager
  * @author  Kerem Güneş
  * @since   1.0
  */
-final class Pager implements Arrayable, Countable, JsonSerializable
+final class Pager implements Arrayable, Objectable, \JsonSerializable
 {
-    /**
-     * @see froq\common\trait\AttributeTrait
-     * @since 4.0
-     */
     use AttributeTrait;
 
     /** @var array */
     private static array $attributesDefault = [
         'start'             => 0,    // Offset.
-        'stop'              => 10,   // Limit or per-page.
+        'stop'              => 10,   // Limit (per-page).
         'stopMax'           => 1000,
         'stopDefault'       => 10,
         'startKey'          => 's',  // GET param key of start.
@@ -49,7 +43,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
         'linksClassName'    => 'pager',
         'numerateFirstLast' => false,
         'autorun'           => true,
-        'redirect'          => true,
+        'redirect'          => false,
         'argSep'            => '&',
     ];
 
@@ -60,21 +54,24 @@ final class Pager implements Arrayable, Countable, JsonSerializable
      */
     public function __construct(array $attributes = null)
     {
+        // @todo: Change that stop/start stuff => limit/offset or page?
+        if ($attributes) {
+            isset($attributes['page'])  && array_swap($attributes, 'page', 'start');
+            isset($attributes['limit']) && array_swap($attributes, 'limit', 'stop');
+            isset($attributes['count']) && array_swap($attributes, 'count', 'totalRecords');
+        }
+
         $this->setAttributes($attributes, self::$attributesDefault);
     }
 
     /**
-     * Magic - set.
-     *
-     * @param  string $name
-     * @param  any    $value
-     * @return void
-     * @since  3.0
+     * @since 3.0
+     * @magic
      */
-    public function __set(string $name, $value)
+    public function __set(string $name, mixed $value): void
     {
-        if (in_array($name, ['limit', 'offset'])) {
-            $name = ($name == 'limit') ? 'stop' : 'start';
+        if (in_array($name, ['limit', 'offset'], true)) {
+            $name  = ($name == 'limit') ? 'stop' : 'start';
             $value = (int) $value;
         }
 
@@ -82,16 +79,14 @@ final class Pager implements Arrayable, Countable, JsonSerializable
     }
 
     /**
-     * Magic - get.
-     *
-     * @param  string $name
-     * @return any|null
-     * @since  3.0
+     * @since 3.0
+     * @magic
      */
-    public function __get(string $name)
+    public function __get(string $name): mixed
     {
-        if (in_array($name, ['limit', 'offset'])) {
+        if (in_array($name, ['limit', 'offset'], true)) {
             $name = ($name == 'limit') ? 'stop' : 'start';
+            return (int) $this->getAttribute($name);
         }
 
         return $this->getAttribute($name);
@@ -104,7 +99,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
      */
     public function getLimit(): int
     {
-        return $this->getAttribute('stop');
+        return (int) $this->getAttribute('stop');
     }
 
     /**
@@ -114,7 +109,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
      */
     public function getOffset(): int
     {
-        return $this->getAttribute('start');
+        return (int) $this->getAttribute('start');
     }
 
     /**
@@ -125,7 +120,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
      */
     public function getCurrent(): int
     {
-        return max(1, ~~($this->start / $this->stop) + 1);
+        return max(1, (int) fdiv($this->start, $this->stop) + 1);
     }
 
     /**
@@ -135,9 +130,9 @@ final class Pager implements Arrayable, Countable, JsonSerializable
      * @param  int|null    $limit
      * @param  string|null $startKey
      * @param  string|null $stopKey
-     * @return array<int>
+     * @return self
      */
-    public function run(int $count = null, int $limit = null, string $startKey = null, string $stopKey = null): array
+    public function run(int $count = null, int $limit = null, string $startKey = null, string $stopKey = null): self
     {
         if ($count !== null) {
             $this->totalRecords = abs($count);
@@ -170,7 +165,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
             // $this->totalPages = abs((int) ceil($this->totalRecords / 1.25)); // @nope
         }
 
-        // Safety (if redirectable / redirect attribute is true).
+        // Safety (if "redirect" attribute is true).
         if ($startValue !== null && $this->redirect) {
             if ($startValue > $this->totalPages) {
                 $this->redirect($this->query() . $this->startKey .'='. $this->totalPages, 307);
@@ -196,7 +191,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
             $this->stop = 1;
         }
 
-        return [$this->stop, $this->start];
+        return $this;
     }
 
     /**
@@ -222,7 +217,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
         }
 
         $links = (array) $this->links;
-        if ($links != null) {
+        if ($links) {
             return $this->template($links, $linksClassName);
         }
 
@@ -338,7 +333,7 @@ final class Pager implements Arrayable, Countable, JsonSerializable
         }
 
         $links = (array) $this->linksCenter;
-        if ($links != null) {
+        if ($links) {
             return $this->template($links, $linksClassName, true);
         }
 
@@ -404,11 +399,6 @@ final class Pager implements Arrayable, Countable, JsonSerializable
 
     /**
      * Make a template with given links.
-     *
-     * @param  array       $links
-     * @param  string|null $linksClassName
-     * @param  bool        $center
-     * @return string
      */
     private function template(array $links, string $linksClassName = null, bool $center = false): string
     {
@@ -417,47 +407,48 @@ final class Pager implements Arrayable, Countable, JsonSerializable
             $linksClassName .= ' center';
         }
 
-        $tpl  = "<ul class=\"{$linksClassName}\">";
+        $ret = "<ul class=\"{$linksClassName}\">";
         foreach ($links as $link) {
-            $tpl .= "<li>{$link}</li>";
+            $ret .= "<li>{$link}</li>";
         }
-        $tpl .= "</ul>";
+        $ret .= "</ul>";
 
-        return $tpl;
+        return $ret;
     }
 
     /**
      * Escape input.
-     *
-     * @param  string $in
-     * @return string
-     * @since  4.0
      */
-    private function escape(string $in): string
+    private function escape(string $input): string
     {
-        return str_replace(["\0", "'", '"', '<', '>'],
-                           ['', '&#39;', '&#34;', '&lt;', '&gt;'], $in);
+        return str_replace(
+            ["\0", "'", '"', '<', '>'],
+            ['', '&#39;', '&#34;', '&lt;', '&gt;'],
+            $input
+        );
     }
 
     /**
      * Prepare query.
-     *
-     * @param  string|null $ignoredKeys
-     * @return string
      */
     private function query(string $ignoredKeys = null): string
     {
         $temp  = explode('?', ($_SERVER['REQUEST_URI'] ?? ''), 2);
-        $path  = $temp[0];
+        $path  = trim($temp[0]);
         $query = trim($temp[1] ?? '');
 
         if ($query != '') {
-            $ignoredKeys = implode(',', [$this->startKey, $ignoredKeys]);
+            $query = http_parse_query_string($query);
 
-            $query = Util::buildQueryString(
-                Util::parseQueryString($query, true),
-                decode: true, ignoredKeys: $ignoredKeys
-            );
+            $keys = $this->startKey;
+            if ($ignoredKeys != '') {
+                $keys .= ',' . $ignoredKeys;
+            }
+
+            // Drop ignored keys.
+            $query = array_unset($query, ...explode(',', $keys));
+
+            $query = http_build_query_string($query);
 
             if ($query != '') {
                 $query .= $this->argSep;
@@ -471,10 +462,6 @@ final class Pager implements Arrayable, Countable, JsonSerializable
 
     /**
      * Redirect.
-     *
-     * @param  string $to
-     * @param  int    $code
-     * @return void
      */
     private function redirect(string $to, int $code): void
     {
@@ -495,13 +482,11 @@ final class Pager implements Arrayable, Countable, JsonSerializable
 
     /**
      * @inheritDoc froq\common\interface\Arrayable
-     * @since      4.1
      */
     public function toArray(bool $noEmpty = true): array
     {
-        [$current, $totalPages, $totalRecords] = [
-            $this->getCurrent(), $this->totalPages, $this->totalRecords
-        ];
+        [$current, $totalPages, $totalRecords]
+            = [$this->getCurrent(), $this->totalPages, $this->totalRecords];
 
         if ($noEmpty && !$totalRecords) {
             $totalPages = 0;
@@ -519,17 +504,16 @@ final class Pager implements Arrayable, Countable, JsonSerializable
     }
 
     /**
-     * @inheritDoc Countable
-     * @since      5.0
+     * @inheritDoc froq\common\interface\Objectable
      */
-    public function count(): int
+    public function toObject(bool $noEmpty = true): object
     {
-        return $this->totalRecords ? $this->totalPages : 0;
+        return (object) $this->toArray($noEmpty);
     }
 
     /**
      * @inheritDoc JsonSerializable
-     * @since      5.0
+     * @since 5.0
      */
     public function jsonSerialize(): array
     {
