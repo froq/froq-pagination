@@ -70,8 +70,8 @@ final class Pager implements Arrayable, Objectable, \JsonSerializable
      */
     public function __set(string $name, mixed $value): void
     {
-        if (in_array($name, ['limit', 'offset'], true)) {
-            $name  = ($name == 'limit') ? 'stop' : 'start';
+        if ($name == 'limit' || $name == 'offset') {
+            $name  = ($name == 'limit') ? 'stop' : 'start'; // Switch name.
             $value = (int) $value;
         }
 
@@ -84,8 +84,8 @@ final class Pager implements Arrayable, Objectable, \JsonSerializable
      */
     public function __get(string $name): mixed
     {
-        if (in_array($name, ['limit', 'offset'], true)) {
-            $name = ($name == 'limit') ? 'stop' : 'start';
+        if ($name == 'limit' || $name == 'offset') {
+            $name = ($name == 'limit') ? 'stop' : 'start'; // Switch name.
             return (int) $this->getAttribute($name);
         }
 
@@ -139,8 +139,8 @@ final class Pager implements Arrayable, Objectable, \JsonSerializable
         }
 
         // Update start/stop keys.
-        $startKey && ($this->startKey = $startKey);
-        $stopKey && ($this->stopKey = $stopKey);
+        $startKey && $this->startKey = $startKey;
+        $stopKey  && $this->stopKey  = $stopKey;
 
         // These stuff may be given in constructor as well.
         $startValue = self::getStartParam($startKey) ?? $this->start;
@@ -153,10 +153,10 @@ final class Pager implements Arrayable, Objectable, \JsonSerializable
         // Get params may be manipulated by developer (setting autorun false).
         if ($this->autorun) {
             $this->start = abs((int) $startValue);
-            $this->stop = abs((int) $stopValue);
+            $this->stop  = abs((int) $stopValue);
         }
 
-        $this->stop = ($this->stop > 0) ? $this->stop : $this->stopDefault;
+        $this->stop  = ($this->stop > 0) ? $this->stop : $this->stopDefault;
         $this->start = ($this->start > 1) ? ($this->start * $this->stop) - $this->stop : 0;
 
         $this->totalPages = 1;
@@ -188,7 +188,7 @@ final class Pager implements Arrayable, Objectable, \JsonSerializable
         // Fix start/stop.
         if ($this->totalRecords == 1) {
             $this->start = 0;
-            $this->stop = 1;
+            $this->stop  = 1;
         }
 
         return $this;
