@@ -1,8 +1,8 @@
 {
-    "name": "froq/froq-pager",
-    "homepage": "http://github.com/froq/froq-pager",
-    "description": "Froq! Pager.",
-    "keywords": ["froq", "pager"],
+    "name": "froq/froq-pagination",
+    "homepage": "http://github.com/froq/froq-pagination",
+    "description": "Froq! Pagination.",
+    "keywords": ["froq", "pagination"],
     "license": "Apache-2.0",
     "authors": [{"name": "Kerem Güneş"}],
     "require": {
