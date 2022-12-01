@@ -11,7 +11,7 @@ use froq\common\interface\{Arrayable, Objectable};
  * Paginator class.
  *
  * @package froq\pagination
- * @object  froq\pagination\Paginator
+ * @class   froq\pagination\Paginator
  * @author  Kerem Güneş
  * @since   7.0
  */

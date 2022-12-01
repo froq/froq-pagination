@@ -11,7 +11,7 @@ use froq\common\trait\OptionTrait;
  * HTML Paginator class with for generating pagination links.
  *
  * @package froq\pagination
- * @object  froq\pagination\Paginator
+ * @class   froq\pagination\Paginator
  * @author  Kerem Güneş
  * @since   1.0, 7.0
  */
