@@ -51,11 +51,11 @@ class Paginator implements Arrayable, Objectable, \JsonSerializable
      * @param int|null $perPage
      * @param int|null $perPageMax
      */
-    public function __construct(int $page = 1, int $perPage = self::PER_PAGE, int $perPageMax = self::PER_PAGE_MAX)
+    public function __construct(int $page = 1, int $perPage = null, int $perPageMax = null)
     {
         $this->setPage($page)
-             ->setPerPage($perPage)
-             ->setPerPageMax($perPageMax);
+             ->setPerPage($perPage ?? static::PER_PAGE)
+             ->setPerPageMax($perPageMax ?? static::PER_PAGE_MAX);
     }
 
     /**
@@ -202,9 +202,9 @@ class Paginator implements Arrayable, Objectable, \JsonSerializable
     public function toArray(): array
     {
         return [
-            'page'         => $this->page,       'perPage'      => $this->perPage,
-            'prevPage'     => $this->prevPage,   'nextPage'     => $this->nextPage,
-            'totalPages'   => $this->totalPages, 'totalRecords' => $this->totalRecords,
+            'page'       => $this->page,       'perPage'      => $this->perPage,
+            'prevPage'   => $this->prevPage,   'nextPage'     => $this->nextPage,
+            'totalPages' => $this->totalPages, 'totalRecords' => $this->totalRecords,
         ];
     }
 
