@@ -42,8 +42,7 @@ class HtmlPaginator extends Paginator
      * @param int|null   $perPageMax
      * @param array|null $options
      */
-    public function __construct(int $page = 1, int $perPage = self::PER_PAGE, int $perPageMax = self::PER_PAGE_MAX,
-        array $options = null)
+    public function __construct(int $page = 1, int $perPage = null, int $perPageMax = null, array $options = null)
     {
         parent::__construct($page, $perPage, $perPageMax);
 
