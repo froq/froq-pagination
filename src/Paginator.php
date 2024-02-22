@@ -128,6 +128,24 @@ class Paginator implements Arrayable, Objectable, \JsonSerializable
     }
 
     /**
+     * Check for pages.
+     *
+     * @return bool
+     */
+    public function hasPages(): bool
+    {
+        return $this->totalPages > 0;
+    }
+
+    /**
+     * @alias getTotalPages()
+     */
+    public function getLastPage()
+    {
+        return $this->getTotalPages();
+    }
+
+    /**
      * @alias getPage()
      */
     public function getCurrentPage()
@@ -183,15 +201,17 @@ class Paginator implements Arrayable, Objectable, \JsonSerializable
      */
     public function paginate(int $totalRecords): self
     {
-        $this->totalPages   = 1;
-        $this->totalRecords = $totalRecords;
+        if ($totalRecords > 0) {
+            $this->totalPages   = 1;
+            $this->totalRecords = $totalRecords;
 
-        if ($this->totalRecords > 1) {
-            $this->totalPages = (int) ceil($this->totalRecords / $this->perPage);
+            if ($this->totalRecords > 1) {
+                $this->totalPages = (int) ceil($this->totalRecords / $this->perPage);
+            }
+
+            $this->prevPage = ($this->page - 1 >= 1) ? $this->page - 1 : null;
+            $this->nextPage = ($this->page + 1 <= $this->totalPages) ? $this->page + 1 : null;
         }
-
-        $this->prevPage = ($this->page - 1 >= 1) ? $this->page - 1 : null;
-        $this->nextPage = ($this->page + 1 <= $this->totalPages) ? $this->page + 1 : null;
 
         return $this;
     }
